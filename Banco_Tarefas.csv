@@ -1,0 +1,105 @@
+﻿titulo;descricao;tempo_estimado;tempo_gasto;complexidade
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1462.MS, S1491.MS, S0241.MS, S1221.MS.;1;1;Média
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0342.MS, S0186.MS, S0189.MS.;1,6;1,5;Média
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1099.MS.;1;0,9;Baixa
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1039.MS, S0320.MS, S0488.MS, S1014.MS.;2;1,8;Alta
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0439.MS, S0768.MS, S0837.MS, S1185.MS, S1415.MS.;1,2;1,1;Média
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1205.MS, S0132.MS.;0,9;0,8;Baixa
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1493.MS, S0804.MS, S1463.MS, S1111.MS, S1135.MS.;2,3;2,2;Alta
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0431.MS, S0967.MS, S1236.MS, S0447.MS.;2,2;2;Alta
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0154.MS.;2,4;2,2;Alta
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1066.MS, S0347.MS, S1193.MS.;1;0,9;Baixa
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0893.MS, S0967.MS, S1209.MS, S1181.MS, S0681.MS.;2,1;1,8;Alta
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1079.MS, S0987.MS, S0373.MS.;1,9;1,7;Média
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S0085.MS, S1345.MS, S1164.MS, S0132.MS.;1;0,9;Baixa
+Aplicar patch de segurança ESXi;Aplicar patch via vCenter e validar reinicialização segura nos hosts: S1116.MS, S0556.MS, S0706.MS.;1,9;1,7;Média
+Atualizar planilha Linha de crescimento Storage;Atualizar planilha com os campos 'Espaço Utilizado' das storages; calcular média se houver múltiplos pools.;1,5;1,3;Média
+Avaliar viabilidade do Harvester;Analisar Harvester como solução de virtualização Kubernetes.;1,2;1,1;Média
+Avaliar viabilidade do NetBackup IBM;Avaliar se NetBackup IBM se integra bem com VMware.;1,3;1,2;Média
+Avaliar viabilidade do OpenShift Virtualization;Analisar OpenShift Virtualization como camada de VM em K8s.;0,8;0,7;Baixa
+Avaliar viabilidade do Veeam Backup;Analisar se Veeam Backup & Replication atende à proteção das VMs.;2,4;2,1;Alta
+Avaliar viabilidade do VMware vSAN;Analisar possibilidade de uso do VMware vSAN.;1,2;1;Média
+Avaliar viabilidade do vRealize Log Insight;Analisar viabilidade de uso do vRLI na infraestrutura atual.;0,8;0,7;Baixa
+Avaliar viabilidade do VxRail;Analisar uso do Dell VxRail como plataforma HCI.;2,3;2,2;Alta
+Coletar dados com vRealize Log Insight;Usar vRLI para coletar métricas e analisar tendências de performance.;2,3;2,1;Alta
+Estudar viabilidade da plataforma Nutanix;Avaliar viabilidade técnica de uso de ambiente Nutanix.;1,8;1,6;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0626.MS, S0755.MS.;1,1;1;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0584.MS, S1216.MS, S1104.MS, S0186.MS.;2,4;2,1;Alta
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0813.MS, S0603.MS, S1092.MS.;1,9;1,7;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0001.MS, S0048.MS, S0686.MS.;0,7;0,6;Baixa
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0804.MS, S0702.MS, S0121.MS.;2,1;1,9;Alta
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0001.MS, S0532.MS.;1,5;1,3;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0932.MS, S1120.MS, S0514.MS, S1389.MS.;1,4;1,3;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0843.MS, S1419.MS.;1,2;1,1;Média
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0646.MS, S0732.MS, S0005.MS.;2,4;2,2;Alta
+Executar análise de logs ESXi/vRealize;Extrair e revisar logs críticos de ESXi e vCenter nos hosts: S0297.MS, S1249.MS, S0252.MS, S0983.MS, S0396.MS.;2;1,8;Alta
+Gerar relatório de servidores da DPGE;Listar VMs alocadas na DPGE.;0,8;0,7;Baixa
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage C para a Storage C, otimizando uso de espaço e desempenho.;0,8;0,7;Baixa
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage C para a Storage B, otimizando uso de espaço e desempenho.;0,9;0,8;Baixa
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage A para a Storage C, otimizando uso de espaço e desempenho.;2,2;2;Alta
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage B para a Storage B, otimizando uso de espaço e desempenho.;0,8;0,7;Baixa
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage D para a Storage D, otimizando uso de espaço e desempenho.;1,7;1,5;Média
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage B para a Storage D, otimizando uso de espaço e desempenho.;1,6;1,4;Média
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage A para a Storage B, otimizando uso de espaço e desempenho.;2,2;1,9;Alta
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage C para a Storage D, otimizando uso de espaço e desempenho.;1,1;1;Média
+Migrar VMs entre datastores;Executar Storage vMotion para mover VMs da Storage D para a Storage C, otimizando uso de espaço e desempenho.;1,1;1;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S1483.MS.;1,8;1,7;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S1455.MS, S1179.MS, S0670.MS, S0288.MS, S0059.MS.;1,3;1,2;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0612.MS, S1296.MS, S0266.MS, S1418.MS.;1;0,9;Baixa
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S1357.MS, S0385.MS, S0402.MS, S1156.MS, S0893.MS.;1,4;1,2;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0362.MS, S0634.MS, S0334.MS, S0115.MS, S0297.MS.;1,2;1,1;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S1207.MS, S0182.MS, S0946.MS.;1,5;1,3;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0308.MS, S0645.MS, S0419.MS.;2,4;2,2;Alta
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0178.MS, S0522.MS.;1,4;1,2;Média
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0473.MS, S1448.MS, S0531.MS, S0923.MS.;2,1;1,8;Alta
+Migrar VMs via Storage vMotion;Mover VMs entre datastores para balanceamento de carga nos hosts: S0880.MS, S1181.MS, S1283.MS.;1,2;1,1;Média
+Reunião para discutir migração de equipamentos para Sonda;Reunião para discutir migração de equipamentos para Sonda. Discutir com setor de backup os equipamentos que serão migrados e analisar a melhor forma de execução;1,6;1,5;Média
+Reunião para discutir migração de equipamentos para Sonda;Reunião para discutir migração de equipamentos para Sonda. Discutir com setor de redes os equipamentos que serão migrados e analisar a melhor forma de execução;2,1;1,9;Alta
+Reunião para discutir migração de equipamentos para Sonda;Reunião para discutir migração de equipamentos para Sonda. Discutir com setor de serviços Windows os equipamentos que serão migrados e analisar a melhor forma de execução;0,8;0,8;Baixa
+Reunião interna migração de serviços para Sonda;Reunião interna migração de serviços para Sonda;0,9;0,8;Baixa
+Realocar VMs para HP DL360 G10-01 - Low;Mover VMs de criticidade alta para o resource pool DELL R650 - Normal conforme política de desempenho.;2,2;2;Alta
+Realocar VMs para HP DL360 G10-01 - Low;Mover VMs de criticidade alta para o resource pool DELL R650 - Low conforme política de desempenho.;1,9;1,7;Média
+Realocar VMs para HP DL360 G10-01 - Normal;Mover VMs de criticidade alta para o resource pool HP DL360 G10-01 - HIGH conforme política de desempenho.;1;0,9;Baixa
+Redistribuir VMs entre Storage A e Storage B;Realizar DRS manual movendo VMs dos datastores de Storage A para Storage B visando balanceamento de carga.;0,8;0,7;Baixa
+Redistribuir VMs entre Storage A e Storage B;Realizar DRS manual movendo VMs dos datastores de Storage A para Storage B visando balanceamento de carga.;0,8;0,7;Baixa
+Redistribuir VMs entre Storage A e Storage D;Realizar DRS manual movendo VMs dos datastores de Storage A para Storage D visando balanceamento de carga.;1,3;1,2;Média
+Redistribuir VMs entre Storage B e Storage C;Realizar DRS manual movendo VMs dos datastores de Storage B para Storage C visando balanceamento de carga.;1,8;1,7;Média
+Redistribuir VMs entre Storage B e Storage D;Realizar DRS manual movendo VMs dos datastores de Storage B para Storage D visando balanceamento de carga.;2,2;2;Alta
+Redistribuir VMs entre Storage C e Storage A;Realizar DRS manual movendo VMs dos datastores de Storage C para Storage A visando balanceamento de carga.;2,2;2;Alta
+Redistribuir VMs entre Storage C e Storage B;Realizar DRS manual movendo VMs dos datastores de Storage C para Storage B visando balanceamento de carga.;1,8;1,5;Média
+Redistribuir VMs entre Storage C e Storage D;Realizar DRS manual movendo VMs dos datastores de Storage C para Storage D visando balanceamento de carga.;2,5;2,3;Alta
+Redistribuir VMs entre Storage A e Storage B;Realizar DRS manual movendo VMs dos datastores de Storage A para Storage B visando balanceamento de carga.;2,2;1,9;Alta
+Redistribuir VMs entre Storage D e Storage C;Realizar DRS manual movendo VMs dos datastores de Storage D para Storage C visando balanceamento de carga.;1,1;1;Média
+Redistribuir VMs entre Storage A e Storage B;Realizar DRS manual movendo VMs dos datastores de Storage A para Storage B visando balanceamento de carga.;2,4;2,1;Alta
+Redistribuir VMs entre Storage D e Storage A;Realizar DRS manual movendo VMs dos datastores de Storage D para Storage A visando balanceamento de carga.;1,8;1,7;Média
+Redistribuir VMs entre Storage C e Storage A;Realizar DRS manual movendo VMs dos datastores de Storage C para Storage A visando balanceamento de carga.;0,8;0,8;Baixa
+Reunião com COTIN sobre virtualização;Discutir com Uglaybe problemas da infraestrutura virtual.;1,4;1,2;Média
+Reunião com COTIN sobre virtualização;Discutir com Uglaybe problemas da infraestrutura virtual.;1,2;1,1;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0233.MS.;1,2;1,1;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0566.MS, S1348.MS, S0837.MS, S1365.MS, S0502.MS.;2,3;2,1;Alta
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0324.MS, S0798.MS, S0392.MS.;1,6;1,5;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S1139.MS.;2,2;2,1;Alta
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0829.MS.;2;1,8;Alta
+Reunião com COTIN sobre virtualização;Discutir com Uglaybe problemas da infraestrutura virtual.;0,9;0,8;Baixa
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S1204.MS, S1444.MS, S0264.MS, S0589.MS, S0292.MS.;1,3;1,2;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S1313.MS, S1138.MS, S1439.MS.;1,4;1,2;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0763.MS.;1,3;1,2;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0458.MS, S0138.MS, S0066.MS.;1,9;1,8;Média
+Reunião com COTIN sobre virtualização;Discutir com Uglaybe problemas da infraestrutura virtual.;1,4;1,2;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S1403.MS, S1468.MS.;1,2;1;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S0005.MS, S1166.MS, S0992.MS, S0413.MS.;1,5;1,3;Média
+Verificar compliance de Host Profile;Ajustar compliance de Host Profiles nos hosts: S1053.MS, S0703.MS, S1193.MS, S0249.MS, S1398.MS.;2,3;2,1;Alta
+Reunião com COTIN sobre virtualização;Discutir com Uglaybe problemas da infraestrutura virtual.;2,4;2,1;Alta
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0875.MS, S1160.MS, S0903.MS, S1088.MS.;1,8;1,7;Média
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0380.MS, S1230.MS, S0247.MS.;2,4;2,1;Alta
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0671.MS, S1255.MS, S0653.MS.;1,3;1,2;Média
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0590.MS, S0181.MS, S0929.MS.;1,5;1,3;Média
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0954.MS, S1135.MS, S0472.MS.;2,5;2,2;Alta
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0140.MS, S0028.MS, S0934.MS, S0386.MS.;0,9;0,8;Baixa
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0335.MS, S0776.MS, S0588.MS, S0471.MS.;2,4;2,1;Alta
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S0149.MS, S0583.MS, S0079.MS, S1286.MS, S0905.MS.;1,8;1,6;Média
+Verificar saúde de hosts com vCenter;Checar status de CPU, rede, memória e alarmes nos hosts: S1026.MS.;2,3;2,1;Alta
+Tarefa de teste 1h;Tarefa de teste para validação do sistema de geração automática - 1 hora exata.;1;1;Baixa
+Tarefa de teste 0.5h;Tarefa de teste para validação do sistema de geração automática - 30 minutos.;0,5;0,5;Baixa
+Tarefa de teste 0.3h;Tarefa de teste para validação do sistema de geração automática - 18 minutos.;0,3;0,3;Baixa
+Tarefa de teste 0.2h;Tarefa de teste para validação do sistema de geração automática - 12 minutos.;0,2;0,2;Baixa

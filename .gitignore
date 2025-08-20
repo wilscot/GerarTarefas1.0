@@ -1,0 +1,19 @@
+# Executáveis desnecessários (manter msedgedriver.exe)
+# *.exe
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Arquivos Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
