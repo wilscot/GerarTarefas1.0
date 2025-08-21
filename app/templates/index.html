@@ -424,6 +424,16 @@
                             case 'success':
                                 statusText = `✅ Concluído com sucesso! (${data.created_task_ids.length} tarefas criadas)`;
                                 statusType = 'success';
+                                
+                                // Adicionar detalhes das tarefas criadas
+                                if (data.created_task_ids && data.created_task_ids.length > 0) {
+                                    let taskDetails = '';
+                                    data.created_task_ids.forEach(task => {
+                                        taskDetails += `<br>Tarefa: ${task.task_id} - ${task.title} (Tempo gasto: ${task.time_spent}h)`;
+                                    });
+                                    statusText += taskDetails;
+                                    statusText += `<br>Cadastrada${data.created_task_ids.length > 1 ? 's' : ''} com sucesso no chamado: ${data.workorder_id}`;
+                                }
                                 break;
                             case 'no_tasks_detected':
                                 statusText = '⚠️ Script executado mas nenhuma tarefa detectada';
@@ -439,16 +449,43 @@
                                 break;
                         }
                         
-                        updateStatus('automation-status', 
-                            `🤖 Automação ${statusText}<br>
-                             Execution ID: ${executionId}<br>
-                             WorkOrder: ${data.workorder_id}<br>
-                             Horas Alvo: ${data.hours_target}<br>
-                             Status: ${status.toUpperCase()}<br>
-                             ${data.finished_at ? `Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`, 
-                            statusType);
+                        let statusDisplay = '';
+                        if (status === 'success' && data.created_task_ids && data.created_task_ids.length > 0) {
+                            // Exibição detalhada para sucessos
+                            let taskList = '';
+                            data.created_task_ids.forEach(task => {
+                                taskList += `<br>📋 Tarefa: ${task.task_id} - ${task.title} (${task.time_spent}h)`;
+                            });
+                            
+                            statusDisplay = `🤖 Automação ✅ Concluído com sucesso! (${data.created_task_ids.length} tarefas criadas)${taskList}<br>
+                                           ✅ Cadastrada${data.created_task_ids.length > 1 ? 's' : ''} com sucesso no chamado: ${data.workorder_id}<br>
+                                           📊 Execution ID: ${executionId}<br>
+                                           🎯 Horas Alvo: ${data.hours_target}<br>
+                                           ⏰ Status: ${status.toUpperCase()}<br>
+                                           ${data.finished_at ? `🕐 Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`;
+                        } else {
+                            // Exibição padrão para outros status
+                            statusDisplay = `🤖 Automação ${statusText}<br>
+                                           Execution ID: ${executionId}<br>
+                                           WorkOrder: ${data.workorder_id}<br>
+                                           Horas Alvo: ${data.hours_target}<br>
+                                           Status: ${status.toUpperCase()}<br>
+                                           ${data.finished_at ? `Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`;
+                        }
                         
-                        addLog(`Automação ${executionId}: ${statusText}`, statusType);
+                        updateStatus('automation-status', statusDisplay, statusType);
+                        
+                        // Log detalhado separado para sucessos
+                        if (status === 'success' && data.created_task_ids && data.created_task_ids.length > 0) {
+                            let detailedLog = `✅ Automação concluída! ${data.created_task_ids.length} tarefa(s) criada(s):`;
+                            data.created_task_ids.forEach(task => {
+                                detailedLog += `\n• Tarefa: ${task.task_id} - ${task.title} (Tempo gasto: ${task.time_spent}h)`;
+                            });
+                            detailedLog += `\nCadastrada(s) com sucesso no chamado: ${data.workorder_id}`;
+                            addLog(detailedLog, statusType);
+                        } else {
+                            addLog(`Automação ${executionId}: ${statusText}`, statusType);
+                        }
                     }
                 } catch (error) {
                     addLog(`Erro ao monitorar automação: ${error.message}`, 'error');
