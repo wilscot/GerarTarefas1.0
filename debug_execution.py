@@ -18,7 +18,7 @@ def debug_execution():
         
         execution_id = "01195460-3d7f-4165-9d7b-ec49160ef1ce"
         workorder_id = 540030
-        target_taskid = 53789  # Task específica criada no teste
+        target_taskid = 53833  # Task existente de hoje
         
         print(f"🔍 Debug da execução {execution_id}")
         print(f"📋 WorkOrder: {workorder_id}")
@@ -73,20 +73,26 @@ def debug_execution():
                 print(f"         {repr(description)}")  # Mostrar com caracteres de escape
                 
                 # Verificar padrões
-                if " -->" in description:
+                if " -->" in description or " --&gt;" in description:
                     import re
-                    padroes = re.findall(r'\d{4} -->', description)
-                    if padroes:
-                        print(f"      🎯 Padrões '#### -->' encontrados: {padroes}")
-                    else:
+                    padroes_normal = re.findall(r'\d{4} -->', description)
+                    padroes_html = re.findall(r'\d{4} --&gt;', description)
+                    
+                    if padroes_normal:
+                        print(f"      🎯 Padrões '#### -->' encontrados: {padroes_normal}")
+                    if padroes_html:
+                        print(f"      🎯 Padrões '#### --&gt;' (HTML) encontrados: {padroes_html}")
+                    
+                    if not padroes_normal and not padroes_html:
                         print(f"      ⚠️  Tem '-->' mas não no formato esperado")
                         # Mostrar contexto do -->
-                        idx = description.find(" -->")
-                        if idx > 0:
-                            contexto = description[max(0, idx-10):idx+10]
-                            print(f"         Contexto: {repr(contexto)}")
+                        for pattern in [" -->", " --&gt;"]:
+                            idx = description.find(pattern)
+                            if idx > 0:
+                                contexto = description[max(0, idx-10):idx+20]
+                                print(f"         Contexto {pattern}: {repr(contexto)}")
                 else:
-                    print(f"      ❌ Sem padrão '-->' na descrição")
+                    print(f"      ❌ Sem padrão '-->' ou '--&gt;' na descrição")
                     desc_preview = description.replace('\n', ' ').replace('\r', ' ')[:200]
                     print(f"         Preview: {desc_preview}...")
             else:
@@ -104,13 +110,13 @@ def debug_execution():
             print(f"   ❌ TASKID {target_taskid} não encontrada!")
             return
         
-        # 3. Simular busca que o código faz (horário da execução: 11:23:44)
+        # 3. Simular busca que o código faz (horário real da task: 12:47:35)
         print(f"\n3️⃣ Simulando busca do código...")
         
-        # Horário da execução: 21/08/2025, 11:23:44
-        exec_time = datetime(2025, 8, 21, 11, 23, 44)
-        start_time = exec_time - timedelta(minutes=15)  # 15 min antes da execução
-        end_time = exec_time + timedelta(minutes=10)    # 10 min depois da execução
+        # Horário real da task: 21/08/2025, 12:47:35
+        exec_time = datetime(2025, 8, 21, 12, 47, 35)
+        start_time = exec_time - timedelta(minutes=5)   # 5 min antes da task
+        end_time = exec_time + timedelta(minutes=5)     # 5 min depois da task
         
         print(f"   📅 Período de busca: {start_time} até {end_time}")
         
@@ -119,7 +125,12 @@ def debug_execution():
         timestamp_fim = int(end_time.timestamp() * 1000)
         
         # Simular diferentes padrões que podem ter sido usados
-        padroes_teste = ["0030 -->", "540030"[-4:] + " -->"]  # WO 540030 -> "0030 -->"
+        padroes_teste = [
+            "0030 -->",  # WO 540030 -> "0030 -->"
+            "0030 --&gt;",  # HTML encoded
+            "4713 -->",  # EXEC_TAG que vimos na descrição
+            "4713 --&gt;"  # EXEC_TAG HTML encoded
+        ]
         
         for padrao in padroes_teste:
             print(f"\n   🔍 Testando padrão: '{padrao}'")
