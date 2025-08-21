@@ -33,6 +33,27 @@ def highlight(driver, element, color='red', width=3):
     except Exception:
         pass
 
+def remove_all_highlights(driver):
+    """Remove todos os highlights deixados pelos elementos"""
+    try:
+        driver.execute_script("""
+            // Remover bordas de todos os elementos
+            var allElements = document.querySelectorAll('*');
+            for (var i = 0; i < allElements.length; i++) {
+                allElements[i].style.border = '';
+            }
+            
+            // Remover foco ativo
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+            
+            // Clicar em área neutra do body
+            document.body.click();
+        """)
+    except Exception:
+        pass
+
 def salvar_last_req(woid):
     with open(LAST_REQ_FILE, "w", encoding="utf-8") as f:
         f.write(str(woid))
@@ -41,7 +62,22 @@ def ler_last_req():
     if not os.path.exists(LAST_REQ_FILE):
         return ""
     with open(LAST_REQ_FILE, encoding="utf-8") as f:
-        return f.read().strip()
+        content = f.read().strip()
+        # Se contém "|", extrair apenas o workorder_id (primeira parte)
+        if "|" in content:
+            return content.split("|")[0]
+        return content
+
+def ler_exec_tag():
+    """Lê EXEC_TAG do arquivo last_request.txt se disponível"""
+    if not os.path.exists(LAST_REQ_FILE):
+        return ""
+    with open(LAST_REQ_FILE, encoding="utf-8") as f:
+        content = f.read().strip()
+        # Se contém "|", extrair o exec_tag (segunda parte)
+        if "|" in content and len(content.split("|")) >= 2:
+            return content.split("|")[1]
+        return ""
 
 def espera_xpath(driver, xpath, timeout=1):
     elem = WebDriverWait(driver, timeout).until(
@@ -270,6 +306,28 @@ def escolher_tarefas_para_8h(rows, alvo=8.0, tentativas=2000):
     rows = [r for r in rows if r["_tempo_gasto_h"] > 0]
     if not rows:
         return None
+    
+    # NOVA LÓGICA: Se alvo <= 2h, usar apenas 1 tarefa
+    if alvo <= 2.0:
+        # Procurar uma tarefa que possa ser ajustada para o alvo
+        for r in rows:
+            if r["_tempo_gasto_h"] <= alvo * 1.5:  # Máximo 50% acima do alvo
+                # Criar cópia da tarefa ajustada
+                tarefa_ajustada = r.copy()
+                tarefa_ajustada["_tempo_gasto_h"] = alvo
+                tarefa_ajustada["tempo_gasto"] = str(alvo).replace(".", ",")
+                tarefa_ajustada["tempo_estimado"] = str(alvo).replace(".", ",")
+                return [tarefa_ajustada]
+        
+        # Se não encontrou, usar a menor tarefa e ajustar
+        tarefa_min = min(rows, key=lambda r: r["_tempo_gasto_h"])
+        tarefa_ajustada = tarefa_min.copy()
+        tarefa_ajustada["_tempo_gasto_h"] = alvo
+        tarefa_ajustada["tempo_gasto"] = str(alvo).replace(".", ",")
+        tarefa_ajustada["tempo_estimado"] = str(alvo).replace(".", ",")
+        return [tarefa_ajustada]
+    
+    # LÓGICA ORIGINAL: Para > 2h, usar múltiplas tarefas
     for _ in range(tentativas):
         random.shuffle(rows)
         soma = 0.0
@@ -317,6 +375,15 @@ def click_tasks_tab(driver, timeout=10):
 def main():
     # Modo sem prompt quando chamado pelo Flask
     NO_PROMPT = os.getenv("NO_PROMPT", "0") == "1"
+    
+    # EXEC_TAG para identificação das tarefas criadas
+    EXEC_TAG = os.getenv("EXEC_TAG", "")
+    # Se não definido via env, tentar ler do arquivo
+    if not EXEC_TAG:
+        EXEC_TAG = ler_exec_tag()
+    
+    if EXEC_TAG:
+        print(f"[exec] Usando EXEC_TAG: {EXEC_TAG}")
 
     # --- CHAMADO ---
     ultimo = ler_last_req().strip()
@@ -351,7 +418,7 @@ def main():
 
     # --- WebDriver / Navegação ---
     options = webdriver.EdgeOptions()
-    options.add_experimental_option("detach", True)
+    options.add_experimental_option("detach", False)  # Permitir fechamento automático
     
     # Usar perfil do usuário para manter logins salvos
     options.add_argument(f'--user-data-dir={PROFILE_PATH}')
@@ -375,7 +442,7 @@ def main():
         
         # Remover opções de perfil e tentar novamente
         options_simple = webdriver.EdgeOptions()
-        options_simple.add_experimental_option("detach", True)
+        options_simple.add_experimental_option("detach", False)  # Permitir fechamento automático
         options_simple.add_argument('--no-sandbox')
         options_simple.add_argument('--disable-dev-shm-usage')
         options_simple.add_argument('--disable-gpu')
@@ -467,10 +534,11 @@ def main():
 
     switch_to_task_iframe(driver)
     espera_visivel(driver, "//*[@id='task-container']")
-    for tarefa in selecao:
+    
+    for idx, tarefa in enumerate(selecao):
         print(f"Preenchendo: {tarefa.get('titulo','(sem título)')}  [{tarefa['_tempo_gasto_h']}h]")
 
-        # TÍTULO
+        # TÍTULO (sem EXEC_TAG - título limpo)
         campo_titulo = espera_visivel(driver, "//*[@id='for_title']", 25)
         driver.execute_script("arguments[0].focus();", campo_titulo)
         campo_titulo.clear()
@@ -482,7 +550,17 @@ def main():
             driver.switch_to.frame(inner_iframes[0])
         desc_body = espera_visivel(driver, "//body[contains(@class,'ze_body') or @class='ze_body' or contains(@class,'editable')]", 15)
         desc_body.click()
-        desc_body.send_keys(tarefa.get("descricao", ""))
+        
+        # Descrição com EXEC_TAG discreto oculto no final (apenas para busca SQL)
+        descricao_original = tarefa.get("descricao", "")
+        if EXEC_TAG:
+            # Extrair apenas os últimos 4 dígitos + seta para ser mais discreto
+            tag_discreto = EXEC_TAG[-4:] + " -->"
+            descricao_com_tag = f"{descricao_original}{tag_discreto}"
+        else:
+            descricao_com_tag = descricao_original
+            
+        desc_body.send_keys(descricao_com_tag)
         driver.switch_to.parent_frame()
 
         # Volta para o iframe do modal de tarefa
@@ -546,14 +624,62 @@ def main():
         driver.switch_to.default_content()
         print("==>> Tarefa criada!")
 
-        if tarefa is not selecao[-1]:
+        # Só prepara nova tarefa se NÃO for a última (usando índice)
+        is_last_task = (idx == len(selecao) - 1)
+        
+        if not is_last_task:
             time.sleep(0.8)
             click_add_task(driver, timeout=1)
             time.sleep(0.8)
             switch_to_task_iframe(driver)
+        else:
+            # É a última tarefa - garantir que estamos no contexto principal limpo
+            print("INFO: Última tarefa concluída - preparando finalização...")
+            driver.switch_to.default_content()
+            time.sleep(2)  # Aguardar estabilização
 
     print(f"SUCESSO: Todas as tarefas do dia foram criadas somando exatamente {horas_alvo}h.")
-    print("INFO: O navegador permanecera aberto (detach=True). O script finalizou.")
+    
+    # Finalizar na aba Tarefas para mostrar o resultado visual
+    try:
+        print("INFO: Finalizando na aba Tarefas para visualização do resultado...")
+        
+        # Garantir contexto limpo
+        driver.switch_to.default_content()
+        time.sleep(1)
+        
+        # PRIMEIRO: Remover TODOS os highlights deixados durante a execução
+        remove_all_highlights(driver)
+        time.sleep(1)
+        
+        # Clicar na aba "Tarefas" para mostrar as tarefas criadas
+        tarefas_tab = driver.find_element(By.XPATH, "//a[contains(@class, 'tab') and contains(text(), 'Tarefas')]")
+        tarefas_tab.click()
+        time.sleep(2)
+        
+        # SEGUNDO: Remover highlights novamente após mudança de aba
+        remove_all_highlights(driver)
+        
+        print("INFO: ✅ Finalizado na aba Tarefas - você pode visualizar as tarefas criadas!")
+        print("INFO: As tarefas foram criadas com sucesso e estão visíveis na tela.")
+        
+        # Aguardar 5 segundos para o usuário ver o resultado
+        print("INFO: Aguardando 5 segundos para visualização das tarefas...")
+        time.sleep(5)
+        
+    except Exception as e:
+        print(f"AVISO: Não foi possível navegar para a aba Tarefas: {e}")
+        print("INFO: As tarefas foram criadas com sucesso, mas navegue manualmente para a aba Tarefas.")
+    
+    # Fechar o navegador automaticamente
+    try:
+        print("INFO: Fechando o navegador automaticamente...")
+        driver.quit()
+        print("INFO: ✅ Navegador fechado com sucesso!")
+    except Exception as e:
+        print(f"AVISO: Erro ao fechar navegador: {e}")
+    
+    print("INFO: Script finalizado com sucesso!")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,12 @@
+{
+  "data": {
+    "workorder_id": 540030,
+    "title": "CSI EAST - Datacenter - Execução de Tarefas",
+    "owner_id": 2007,
+    "created_time": "2025-08-18T07:30:00.362000",
+    "updated_at": "2025-08-21T13:20:38.780879",
+    "cached": true,
+    "source": "sql"
+  },
+  "cached_at": "2025-08-21T13:20:38.780902"
+}

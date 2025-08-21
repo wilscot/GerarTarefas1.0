@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceDesk Automations - Fase 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .success { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .warning { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        .danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .input-group input {
+            width: 200px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .status-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-info { background: #d1ecf1; color: #0c5460; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                min-width: auto;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ServiceDesk Automations</h1>
+            <p>Fase 1: Foundation & Core Logic</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="grid">
+                <!-- Status SQL -->
+                <div class="section">
+                    <h2>📊 Status SQL Server</h2>
+                    <div class="button-group">
+                        <button onclick="testSqlConnection()">Testar Conexão SQL</button>
+                    </div>
+                    <div id="sql-status" class="status-display">
+                        Clique em "Testar Conexão SQL" para verificar o status...
+                    </div>
+                </div>
+                
+                <!-- WorkOrder Atual -->
+                <div class="section">
+                    <h2>📋 Chamado Vigente</h2>
+                    <div class="button-group">
+                        <button onclick="getCurrentWorkOrder()">Buscar Chamado</button>
+                        <button onclick="refreshWorkOrder()" class="warning">Atualizar Cache</button>
+                    </div>
+                    <div id="workorder-status" class="status-display">
+                        Clique em "Buscar Chamado" para obter o chamado vigente...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Automação -->
+            <div class="section">
+                <h2>🤖 Automação Selenium</h2>
+                <div class="input-group">
+                    <label for="hours-target">Horas Alvo:</label>
+                    <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
+                </div>
+                <div class="button-group">
+                    <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
+                    <button onclick="getRunningProcesses()">Ver Processos</button>
+                </div>
+                <div id="automation-status" class="status-display">
+                    Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
+                </div>
+            </div>
+            
+            <!-- Logs em Tempo Real -->
+            <div class="section">
+                <h2>📄 Logs da Aplicação</h2>
+                <div class="button-group">
+                    <button onclick="clearLogs()" class="danger">Limpar Logs</button>
+                    <button onclick="toggleAutoRefresh()" id="auto-refresh-btn">Auto-Refresh: OFF</button>
+                </div>
+                <div id="logs-display" class="status-display" style="max-height: 400px;">
+                    Logs da aplicação aparecerão aqui...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefresh = false;
+        let refreshInterval;
+        
+        // Utilitários
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs-display');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `status-item status-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function updateStatus(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status-item status-${type}">${content}</div>`;
+        }
+        
+        function setButtonLoading(buttonId, loading = true) {
+            const button = document.getElementById(buttonId);
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML += '<span class="loading"></span>';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.innerHTML.replace('<span class="loading"></span>', '');
+            }
+        }
+        
+        // Funções da API
+        async function testSqlConnection() {
+            addLog('Testando conexão com SQL Server...', 'info');
+            
+            try {
+                const response = await fetch('/status/sql');
+                const data = await response.json();
+                
+                if (data.sql_connected) {
+                    updateStatus('sql-status', 
+                        `✅ Conectado ao SQL Server<br>
+                         Latência: ${data.latency_ms}ms<br>
+                         Verificado em: ${new Date(data.checked_at).toLocaleString()}`, 
+                        'success');
+                    addLog('Conexão SQL estabelecida com sucesso', 'success');
+                } else {
+                    updateStatus('sql-status', 
+                        `❌ Falha na conexão<br>
+                         Erro: ${data.error || 'Erro desconhecido'}`, 
+                        'error');
+                    addLog(`Erro na conexão SQL: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus('sql-status', `❌ Erro de rede: ${error.message}`, 'error');
+                addLog(`Erro de rede ao testar SQL: ${error.message}`, 'error');
+            }
+        }
+        
+        async function getCurrentWorkOrder(refresh = false) {
+            addLog('Buscando chamado vigente...', 'info');
+            
+            try {
+                const url = refresh ? '/workorders/current?refresh=true' : '/workorders/current';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateStatus('workorder-status', 
+                        `📋 Chamado Encontrado<br>
+                         ID: ${data.workorder_id}<br>
+                         Título: ${data.title}<br>
+                         Owner: ${data.owner_id}<br>
+                         Fonte: ${data.source.toUpperCase()}<br>
+                         Atualizado: ${new Date(data.updated_at).toLocaleString()}`, 
+                        'success');
+                    addLog(`Chamado vigente: ${data.workorder_id} (${data.source})`, 'success');
+                } else {
+                    updateStatus('workorder-status', 
+                        `❌ Chamado não encontrado<br>
+                         Erro: ${data.error}`, 
+                        'error');
+                    addLog(`Erro ao buscar chamado: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus('workorder-status', `❌ Erro de rede: ${error.message}`, 'error');
+                addLog(`Erro de rede ao buscar chamado: ${error.message}`, 'error');
+            }
+        }
+        
+        async function refreshWorkOrder() {
+            addLog('Invalidando cache e atualizando chamado...', 'warning');
+            
+            try {
+                // Invalidar cache
+                await fetch('/workorders/cache/invalidate', { method: 'POST' });
+                addLog('Cache invalidado', 'info');
+                
+                // Buscar novamente
+                await getCurrentWorkOrder(true);
+            } catch (error) {
+                addLog(`Erro ao atualizar chamado: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runAutomation() {
+            const hoursTarget = parseFloat(document.getElementById('hours-target').value);
+            
+            if (isNaN(hoursTarget) || hoursTarget <= 0 || hoursTarget > 24) {
+                addLog('Horas alvo deve estar entre 0.1 e 24', 'error');
+                return;
+            }
+            
+            addLog(`Iniciando automação para ${hoursTarget}h...`, 'info');
+            setButtonLoading('run-automation-btn', true);
+            
+            try {
+                const response = await fetch('/automation/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        hours_target: hoursTarget
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateStatus('automation-status', 
+                        `🚀 Automação Iniciada<br>
+                         Execution ID: ${data.execution_id}<br>
+                         WorkOrder: ${data.workorder_id}<br>
+                         Horas Alvo: ${data.hours_target}<br>
+                         Iniciado em: ${new Date(data.started_at).toLocaleString()}`, 
+                        'success');
+                    addLog(`Automação iniciada - Execution: ${data.execution_id}`, 'success');
+                    
+                    // Monitorar progresso
+                    monitorAutomation(data.execution_id);
+                } else {
+                    updateStatus('automation-status', 
+                        `❌ Falha ao iniciar automação<br>
+                         Erro: ${data.error}`, 
+                        'error');
+                    addLog(`Erro na automação: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus('automation-status', `❌ Erro de rede: ${error.message}`, 'error');
+                addLog(`Erro de rede na automação: ${error.message}`, 'error');
+            } finally {
+                setButtonLoading('run-automation-btn', false);
+            }
+        }
+        
+        async function monitorAutomation(executionId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`/automation/result/${executionId}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const status = data.status;
+                        let statusText = '';
+                        let statusType = 'info';
+                        
+                        switch (status) {
+                            case 'started':
+                            case 'running':
+                                statusText = '🔄 Executando...';
+                                statusType = 'info';
+                                setTimeout(checkStatus, 5000); // Check again in 5s
+                                break;
+                            case 'success':
+                                statusText = `✅ Concluído com sucesso! (${data.created_task_ids.length} tarefas criadas)`;
+                                statusType = 'success';
+                                break;
+                            case 'no_tasks_detected':
+                                statusText = '⚠️ Script executado mas nenhuma tarefa detectada';
+                                statusType = 'warning';
+                                break;
+                            case 'error':
+                                statusText = `❌ Erro: ${data.error}`;
+                                statusType = 'error';
+                                break;
+                            case 'not_found':
+                                statusText = '❓ Execution ID não encontrado';
+                                statusType = 'error';
+                                break;
+                        }
+                        
+                        updateStatus('automation-status', 
+                            `🤖 Automação ${statusText}<br>
+                             Execution ID: ${executionId}<br>
+                             WorkOrder: ${data.workorder_id}<br>
+                             Horas Alvo: ${data.hours_target}<br>
+                             Status: ${status.toUpperCase()}<br>
+                             ${data.finished_at ? `Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`, 
+                            statusType);
+                        
+                        addLog(`Automação ${executionId}: ${statusText}`, statusType);
+                    }
+                } catch (error) {
+                    addLog(`Erro ao monitorar automação: ${error.message}`, 'error');
+                }
+            };
+            
+            checkStatus();
+        }
+        
+        async function getRunningProcesses() {
+            addLog('Consultando processos em execução...', 'info');
+            
+            try {
+                const response = await fetch('/automation/processes');
+                const data = await response.json();
+                
+                updateStatus('automation-status', 
+                    `📊 Processos de Automação<br>
+                     Total: ${data.total_processes}<br>
+                     ${Object.keys(data.processes).length > 0 ? 
+                       Object.entries(data.processes).map(([pid, proc]) => 
+                         `• ${pid}: WO ${proc.workorder_id} (${proc.status})`
+                       ).join('<br>') : 
+                       'Nenhum processo ativo'}`, 
+                    'info');
+                
+                addLog(`${data.total_processes} processos encontrados`, 'info');
+            } catch (error) {
+                addLog(`Erro ao consultar processos: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('logs-display').innerHTML = 'Logs limpos...';
+        }
+        
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const button = document.getElementById('auto-refresh-btn');
+            
+            if (autoRefresh) {
+                button.textContent = 'Auto-Refresh: ON';
+                button.className = 'success';
+                refreshInterval = setInterval(() => {
+                    getCurrentWorkOrder();
+                }, 30000); // Refresh every 30s
+                addLog('Auto-refresh ativado (30s)', 'info');
+            } else {
+                button.textContent = 'Auto-Refresh: OFF';
+                button.className = '';
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                }
+                addLog('Auto-refresh desativado', 'info');
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('Aplicação inicializada', 'success');
+            testSqlConnection();
+            getCurrentWorkOrder();
+        });
+    </script>
+</body>
+</html>
