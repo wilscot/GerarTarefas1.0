@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Calendar API</title>
+</head>
+<body>
+    <h1>Calendar API Test</h1>
+    <div id="result"></div>
+    <div id="error" style="color: red;"></div>
+
+    <script>
+        async function testCalendarAPI() {
+            try {
+                console.log('Testando API do calendário...');
+                const response = await fetch('/calendar/data');
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                const result = await response.json();
+                console.log('Result:', result);
+                
+                if (response.ok && result.success) {
+                    document.getElementById('result').innerHTML = `
+                        <h2>✅ API funcionando!</h2>
+                        <p>Período: ${result.data.period_start} - ${result.data.period_end}</p>
+                        <p>Total de tarefas: ${result.data.summary.total_tasks}</p>
+                        <p>Semanas encontradas: ${result.data.weeks_data.length}</p>
+                        <p>Primeira semana tem ${result.data.weeks_data[0] ? result.data.weeks_data[0].length : 0} dias</p>
+                        <p>Primeiro dia: ${JSON.stringify(result.data.weeks_data[0] ? result.data.weeks_data[0][0] : 'N/A')}</p>
+                    `;
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('error').innerHTML = `❌ Erro: ${error.message}`;
+            }
+        }
+
+        // Testar quando a página carregar
+        window.onload = testCalendarAPI;
+    </script>
+</body>
+</html>

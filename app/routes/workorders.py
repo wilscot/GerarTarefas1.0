@@ -70,6 +70,17 @@ def invalidate_cache():
             "cache_invalidated": False
         }), 500
 
+@workorders_bp.route('/clear-cache', methods=['POST'])
+def clear_cache():
+    """
+    Limpa o cache do chamado vigente
+    """
+    try:
+        success = CacheService.invalidate_current_workorder()
+        return jsonify({"success": success, "message": "Cache limpo"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @workorders_bp.route('/<int:workorder_id>', methods=['GET'])
 def get_workorder_by_id(workorder_id: int):
     """

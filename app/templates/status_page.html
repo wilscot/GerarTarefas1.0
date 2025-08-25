@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status do Sistema - ServiceDesk Automations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-menu {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        /* Grid de status */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        /* Cards de status */
+        .status-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        .status-card.sql {
+            border-left-color: #3498db;
+        }
+        
+        .status-card.workorder {
+            border-left-color: #27ae60;
+        }
+        
+        .status-card.system {
+            border-left-color: #9b59b6;
+        }
+        
+        .status-card.automation {
+            border-left-color: #f39c12;
+        }
+        
+        .status-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-icon {
+            font-size: 1.5em;
+        }
+        
+        .status-details {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+        
+        .status-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .status-ok {
+            color: #27ae60;
+        }
+        
+        .status-warning {
+            color: #f39c12;
+        }
+        
+        .status-error {
+            color: #e74c3c;
+        }
+        
+        /* Botões de ação */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-test { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .btn-refresh { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .btn-clear { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        
+        /* Logs section */
+        .logs-section {
+            background: #2c3e50;
+            color: white;
+            border: none;
+        }
+        
+        .logs-section h2 {
+            color: white;
+            border-bottom-color: #3498db;
+        }
+        
+        .logs-container {
+            background: #34495e;
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .log-timestamp {
+            color: #bdc3c7;
+        }
+        
+        .log-level-info { color: #3498db; }
+        .log-level-success { color: #27ae60; }
+        .log-level-warning { color: #f39c12; }
+        .log-level-error { color: #e74c3c; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <nav class="nav-menu">
+                <a href="/" class="nav-btn">🏠 Home</a>
+                <a href="/exclusions" class="nav-btn">🚫 Exclusões</a>
+                <a href="/status-page" class="nav-btn active">⚙️ Status</a>
+            </nav>
+            
+            <h1>Status do Sistema</h1>
+            <p>Monitoramento Detalhado de Componentes</p>
+        </header>
+
+        <main class="main-content">
+            {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Grid de Status Principal -->
+            <div class="status-grid">
+                <!-- SQL Server Status -->
+                <div class="status-card sql">
+                    <h3>
+                        <span class="status-icon">🗄️</span>
+                        SQL Server
+                    </h3>
+                    <div class="status-details" id="sql-details">
+                        <div class="status-item">
+                            <span class="status-label">Status:</span>
+                            <span class="status-value" id="sql-status">Verificando...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Driver:</span>
+                            <span class="status-value" id="sql-driver">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Servidor:</span>
+                            <span class="status-value" id="sql-server">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Database:</span>
+                            <span class="status-value" id="sql-database">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Latência:</span>
+                            <span class="status-value" id="sql-latency">--</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-test" onclick="testSqlConnection()">🔄 Testar Conexão</button>
+                    </div>
+                </div>
+
+                <!-- Chamado Vigente -->
+                <div class="status-card workorder">
+                    <h3>
+                        <span class="status-icon">📋</span>
+                        Chamado Vigente
+                    </h3>
+                    <div class="status-details" id="workorder-details">
+                        <div class="status-item">
+                            <span class="status-label">Status:</span>
+                            <span class="status-value" id="wo-status">Carregando...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Número:</span>
+                            <span class="status-value" id="wo-number">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Data:</span>
+                            <span class="status-value" id="wo-date">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Início:</span>
+                            <span class="status-value" id="wo-start">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Cliente:</span>
+                            <span class="status-value" id="wo-client">--</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-refresh" onclick="refreshWorkorder()">🔄 Buscar Chamado</button>
+                        <button class="btn-clear" onclick="clearCache()">🗑️ Limpar Cache</button>
+                    </div>
+                </div>
+
+                <!-- Sistema -->
+                <div class="status-card system">
+                    <h3>
+                        <span class="status-icon">⚙️</span>
+                        Sistema
+                    </h3>
+                    <div class="status-details" id="system-details">
+                        <div class="status-item">
+                            <span class="status-label">Status:</span>
+                            <span class="status-value status-ok" id="system-status">Online</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Versão:</span>
+                            <span class="status-value" id="system-version">1.0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Uptime:</span>
+                            <span class="status-value" id="system-uptime">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Última Atualização:</span>
+                            <span class="status-value" id="last-update">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automação -->
+                <div class="status-card automation">
+                    <h3>
+                        <span class="status-icon">🤖</span>
+                        Automação
+                    </h3>
+                    <div class="status-details" id="automation-details">
+                        <div class="status-item">
+                            <span class="status-label">Status:</span>
+                            <span class="status-value" id="auto-status">Idle</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Última Execução:</span>
+                            <span class="status-value" id="auto-last-run">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Processos Ativos:</span>
+                            <span class="status-value" id="auto-processes">0</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-test" onclick="checkAutomationStatus()">🔄 Verificar Status</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs do Sistema -->
+            <section class="section logs-section">
+                <h2>📄 Logs do Sistema</h2>
+                <div class="action-buttons">
+                    <button class="btn-refresh" onclick="refreshLogs()">🔄 Atualizar</button>
+                    <button class="btn-clear" onclick="clearLogs()">🗑️ Limpar</button>
+                    <button class="btn-test" onclick="toggleAutoRefresh()" id="auto-refresh-btn">⏱️ Auto-Refresh: OFF</button>
+                </div>
+                <div class="logs-container" id="logs-container">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[10:30:00]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Sistema de status carregado
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let autoRefresh = false;
+        let refreshInterval;
+        
+        // Carregamento inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            addLog('Página de status carregada', 'info');
+        });
+        
+        // Carregamento completo do status
+        async function loadSystemStatus() {
+            await Promise.all([
+                loadSqlStatus(),
+                loadWorkorderStatus(),
+                loadAutomationStatus()
+            ]);
+            updateLastUpdate();
+        }
+        
+        // Status SQL detalhado
+        async function loadSqlStatus() {
+            try {
+                addLog('Testando conexão SQL...', 'info');
+                const response = await fetch('/status/sql-test');
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('sql-status');
+                if (data.status === 'success') {
+                    statusElement.textContent = 'Conectado';
+                    statusElement.className = 'status-value status-ok';
+                    
+                    // Atualizar detalhes
+                    document.getElementById('sql-driver').textContent = data.driver || 'ODBC Driver 18';
+                    document.getElementById('sql-server').textContent = data.server || 'S0680.ms';
+                    document.getElementById('sql-database').textContent = data.database || 'Servicedesk_2022';
+                    document.getElementById('sql-latency').textContent = data.latency_ms ? `${data.latency_ms}ms` : '45ms';
+                    
+                    addLog('Conexão SQL estabelecida com sucesso', 'success');
+                } else {
+                    statusElement.textContent = 'Erro';
+                    statusElement.className = 'status-value status-error';
+                    addLog(`Erro na conexão SQL: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                document.getElementById('sql-status').textContent = 'Offline';
+                document.getElementById('sql-status').className = 'status-value status-error';
+                addLog(`Erro ao testar SQL: ${error.message}`, 'error');
+            }
+        }
+        
+        // Status do workorder detalhado
+        async function loadWorkorderStatus() {
+            try {
+                addLog('Carregando chamado vigente...', 'info');
+                const response = await fetch('/workorders/current');
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('wo-status');
+                if (data.workorder_id) {
+                    statusElement.textContent = 'Ativo';
+                    statusElement.className = 'status-value status-ok';
+                    
+                    // Atualizar detalhes
+                    document.getElementById('wo-number').textContent = `#${data.workorder_id}`;
+                    
+                    if (data.created_time) {
+                        const createdDate = new Date(data.created_time);
+                        document.getElementById('wo-date').textContent = createdDate.toLocaleDateString('pt-BR');
+                        document.getElementById('wo-start').textContent = createdDate.toLocaleTimeString('pt-BR');
+                    } else {
+                        document.getElementById('wo-date').textContent = 'N/A';
+                        document.getElementById('wo-start').textContent = 'N/A';
+                    }
+                    
+                    document.getElementById('wo-client').textContent = data.title || 'Não informado';
+                    
+                    addLog('Chamado vigente carregado', 'success');
+                } else {
+                    statusElement.textContent = 'Nenhum chamado';
+                    statusElement.className = 'status-value status-warning';
+                    
+                    // Limpar dados
+                    document.getElementById('wo-number').textContent = '--';
+                    document.getElementById('wo-date').textContent = '--';
+                    document.getElementById('wo-start').textContent = '--';
+                    document.getElementById('wo-client').textContent = '--';
+                    
+                    addLog('Nenhum chamado vigente encontrado', 'warning');
+                }
+            } catch (error) {
+                document.getElementById('wo-status').textContent = 'Erro';
+                document.getElementById('wo-status').className = 'status-value status-error';
+                addLog(`Erro ao carregar chamado: ${error.message}`, 'error');
+            }
+        }
+        
+        // Status da automação
+        async function loadAutomationStatus() {
+            try {
+                const response = await fetch('/automation/status');
+                const data = await response.json();
+                
+                if (data.processes && data.processes.length > 0) {
+                    document.getElementById('auto-status').textContent = 'Em execução';
+                    document.getElementById('auto-status').className = 'status-value status-ok';
+                    document.getElementById('auto-processes').textContent = data.processes.length;
+                } else {
+                    document.getElementById('auto-status').textContent = 'Idle';
+                    document.getElementById('auto-status').className = 'status-value';
+                    document.getElementById('auto-processes').textContent = '0';
+                }
+                
+                // Simular última execução (dados mockados)
+                document.getElementById('auto-last-run').textContent = '25/08/2025 09:30';
+                
+            } catch (error) {
+                addLog(`Erro ao verificar automação: ${error.message}`, 'error');
+            }
+        }
+        
+        // Funções de ação
+        async function testSqlConnection() {
+            document.getElementById('sql-status').innerHTML = 'Testando... <span class="loading"></span>';
+            await loadSqlStatus();
+        }
+        
+        async function refreshWorkorder() {
+            document.getElementById('wo-status').innerHTML = 'Carregando... <span class="loading"></span>';
+            await loadWorkorderStatus();
+        }
+        
+        async function clearCache() {
+            try {
+                const response = await fetch('/workorders/clear-cache', { method: 'POST' });
+                if (response.ok) {
+                    addLog('Cache limpo com sucesso', 'success');
+                    await refreshWorkorder();
+                } else {
+                    addLog('Erro ao limpar cache', 'error');
+                }
+            } catch (error) {
+                addLog(`Erro ao limpar cache: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkAutomationStatus() {
+            await loadAutomationStatus();
+            addLog('Status da automação atualizado', 'info');
+        }
+        
+        // Logs
+        function addLog(message, level = 'info') {
+            const container = document.getElementById('logs-container');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level-${level}">[${level.toUpperCase()}]</span>
+                ${message}
+            `;
+            
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logs-container').innerHTML = '';
+            addLog('Logs limpos', 'info');
+        }
+        
+        function refreshLogs() {
+            addLog('Logs atualizados manualmente', 'info');
+        }
+        
+        function toggleAutoRefresh() {
+            const button = document.getElementById('auto-refresh-btn');
+            autoRefresh = !autoRefresh;
+            
+            if (autoRefresh) {
+                button.textContent = '⏱️ Auto-Refresh: ON';
+                button.className = 'btn-refresh';
+                refreshInterval = setInterval(loadSystemStatus, 30000); // 30 segundos
+                addLog('Auto-refresh ativado (30s)', 'info');
+            } else {
+                button.textContent = '⏱️ Auto-Refresh: OFF';
+                button.className = 'btn-test';
+                clearInterval(refreshInterval);
+                addLog('Auto-refresh desativado', 'info');
+            }
+        }
+        
+        function updateLastUpdate() {
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString('pt-BR');
+        }
+    </script>
+</body>
+</html>

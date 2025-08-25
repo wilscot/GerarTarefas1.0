@@ -1,0 +1,22 @@
+{
+  "exclusions": [
+    {
+      "id": "b0771258-b158-49ef-b707-8de6fc6d1b37",
+      "date": "2025-07-31",
+      "reason": "banco-horas",
+      "hours": 8.0,
+      "created_at": "2025-08-25T10:20:28.677059",
+      "period_start": "2025-07-26",
+      "period_end": "2025-08-25"
+    },
+    {
+      "id": "bc9ae16e-c31a-4432-8a4f-0efb9445b126",
+      "date": "2025-08-06",
+      "reason": "banco-horas",
+      "hours": 8.0,
+      "created_at": "2025-08-25T10:20:52.039285",
+      "period_start": "2025-07-26",
+      "period_end": "2025-08-25"
+    }
+  ]
+}
