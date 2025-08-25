@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceDesk Automations - Fase 1</title>
+    <title>ServiceDesk Automations - Sistema de Gestão de Tarefas</title>
     <style>
         * {
             margin: 0;
@@ -32,6 +32,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
         }
         
         .header h1 {
@@ -44,12 +45,43 @@
             opacity: 0.9;
         }
         
+        /* Menu de navegação no topo */
+        .nav-menu {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255,255,255,0.4);
+        }
+        
         .main-content {
             padding: 30px;
         }
         
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding: 25px;
             border: 1px solid #e1e8ed;
             border-radius: 8px;
@@ -62,6 +94,398 @@
             font-size: 1.5em;
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
+        }
+        
+        /* Card de Status Resumido */
+        .status-summary-section {
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            border: 2px solid #95a5a6;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .status-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .status-summary-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .status-summary-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .status-icon {
+            font-size: 2em;
+            opacity: 0.8;
+        }
+        
+        .status-info {
+            flex: 1;
+        }
+        
+        .status-title {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .status-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .status-ok {
+            color: #27ae60;
+        }
+        
+        .status-error {
+            color: #e74c3c;
+        }
+        
+        /* Seção de Capacidade Técnica */
+        .capacity-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .capacity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .capacity-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .capacity-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .capacity-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .capacity-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .capacity-bruta .capacity-value { color: #3498db; }
+        .capacity-exclusoes .capacity-value { color: #e74c3c; }
+        .capacity-liquida .capacity-value { color: #27ae60; }
+        
+        /* Seção do Calendário de Produtividade */
+        .calendar-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid #6c757d;
+            margin-bottom: 30px;
+        }
+        
+        .calendar-container {
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .calendar-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .calendar-legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            gap: 2px;
+            background: #dee2e6;
+            padding: 2px;
+            border-radius: 8px;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+        
+        .weekday-header {
+            background: #6c757d;
+            color: white;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .calendar-weeks {
+            display: grid;
+            gap: 2px;
+        }
+        
+        .calendar-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        
+        .calendar-day {
+            background: white;
+            min-height: 80px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .calendar-day.selected {
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .day-info {
+            font-size: 0.8em;
+            line-height: 1.2;
+        }
+        
+        .task-count {
+            color: #6c757d;
+        }
+        
+        .hours-worked {
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        
+        /* Cores do calendário baseadas na produtividade */
+        .calendar-day.weekend {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .calendar-day.out-of-period {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: default;
+        }
+        
+        .calendar-day.out-of-period:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .calendar-day.excluded-total {
+            background: #ffeaa7;
+            border-left: 4px solid #fdcb6e;
+        }
+        
+        .calendar-day.good {
+            background: #d4ffdd;
+            border-left: 4px solid #00b894;
+        }
+        
+        .calendar-day.good .hours-worked {
+            color: #00b894;
+        }
+        
+        .calendar-day.average {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .calendar-day.average .hours-worked {
+            color: #e67e22;
+        }
+        
+        .calendar-day.low {
+            background: #f8d7da;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .calendar-day.low .hours-worked {
+            color: #e74c3c;
+        }
+        
+        .calendar-day.none {
+            background: #ffffff;
+            border-left: 4px solid #bdc3c7;
+        }
+        
+        .calendar-day.good-with-exclusion {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+        }
+        
+        .calendar-day.low-with-exclusion {
+            background: #ffecd1;
+            border-left: 4px solid #fd7e14;
+        }
+        
+        /* Loading state */
+        .calendar-loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal para detalhes do dia */
+        .day-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .modal-close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .modal-close:hover {
+            color: #000;
+        }
+        
+        .task-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .task-details {
+            font-size: 0.9em;
+            color: #6c757d;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .capacity-subtitle {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .period-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #2c3e50;
         }
         
         .button-group {
@@ -100,21 +524,70 @@
         .warning { background: linear-gradient(45deg, #f39c12, #e67e22); }
         .danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
         
+        /* Status display styling */
+        .status-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .status-item {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        
+        .status-info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .logs-area {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* Input styling */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .input-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
             color: #2c3e50;
         }
         
         .input-group input {
-            width: 200px;
+            width: 100%;
             padding: 10px;
-            border: 2px solid #ddd;
+            border: 2px solid #bdc3c7;
             border-radius: 4px;
             font-size: 14px;
         }
@@ -122,49 +595,6 @@
         .input-group input:focus {
             outline: none;
             border-color: #3498db;
-        }
-        
-        .status-display {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .status-item {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        
-        .status-success { background: #d4edda; color: #155724; }
-        .status-error { background: #f8d7da; color: #721c24; }
-        .status-info { background: #d1ecf1; color: #0c5460; }
-        .status-warning { background: #fff3cd; color: #856404; }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            button {
-                min-width: auto;
-            }
         }
         
         .loading {
@@ -182,119 +612,175 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .capacity-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                min-width: auto;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🚀 ServiceDesk Automations</h1>
-            <p>Fase 1: Foundation & Core Logic</p>
-            <!-- Links diretos para depuração -->
-            <div style="margin-top: 10px; font-size: 0.8em;">
-                <a href="/" style="color: white; margin: 0 10px;">Home</a>
-            </div>
-        </div>
-        
-        <div class="main-content">
-            <div class="grid" style="grid-template-columns: 1fr 2fr 1fr; gap: 20px;">
-                <!-- Status SQL (Coluna Esquerda) -->
-                <div class="section">
-                    <h2>📊 Status SQL Server</h2>
-                    <div class="button-group">
-                        <button onclick="testSqlConnection()">Testar Conexão SQL</button>
-                    </div>
-                    <div id="sql-status" class="status-display">
-                        Clique em "Testar Conexão SQL" para verificar o status...
-                    </div>
-                </div>
-                
-                <!-- Coluna Central -->
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <!-- Período Vigente -->
-                    <div class="section">
-                        <h2>� Período Vigente</h2>
-                        <div style="background: #f1f2f6; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-                            <h3 style="color: #3498db; margin-bottom: 10px;">Período 26 a 25</h3>
-                            <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;" id="period-dates">
-                                Carregando...
-                            </div>
-                            <div style="margin-top: 8px; color: #7f8c8d; font-size: 0.85em; font-style: italic;" id="reference-date">
-                                Data de referência: Carregando...
-                            </div>
-                        </div>
-                        
-                        <!-- Dados de Capacidade -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
-                                <h3 style="color: #3498db; margin-bottom: 15px; font-size: 1.2em;">Dias Úteis</h3>
-                                <div style="font-size: 2.8em; font-weight: bold; color: #2c3e50; margin-bottom: 10px;" id="business-days">0</div>
-                                <div style="color: #7f8c8d; font-size: 0.9em;">dias (seg-sex)</div>
-                            </div>
-                            
-                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
-                                <h3 style="color: #3498db; margin-bottom: 15px; font-size: 1.2em;">Capacidade Total</h3>
-                                <div style="font-size: 2.8em; font-weight: bold; color: #2c3e50; margin-bottom: 10px;" id="capacity-hours">0</div>
-                                <div style="color: #7f8c8d; font-size: 0.9em;">horas (8h/dia)</div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 15px; text-align: center; font-size: 0.85em; color: #666;" id="capacity-note">
-                            Período fixo 26->25, considera apenas seg-sex, 8h/dia, sem feriados.
+        <header class="header">
+            <!-- Menu de navegação -->
+            <nav class="nav-menu">
+                <a href="/" class="nav-btn active">🏠 Home</a>
+                <a href="/exclusions" class="nav-btn">🚫 Exclusões</a>
+                <a href="/status-page" class="nav-btn">⚙️ Status</a>
+            </nav>
+            
+            <h1>ServiceDesk Automations</h1>
+            <p>Sistema de Gestão de Tarefas e Capacidade Técnica</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Card de Status Resumido -->
+            <section class="section status-summary-section">
+                <div class="status-summary-grid">
+                    <div class="status-summary-card">
+                        <div class="status-icon">🗄️</div>
+                        <div class="status-info">
+                            <div class="status-title">SQL Server</div>
+                            <div class="status-value" id="sql-status-summary">Verificando...</div>
                         </div>
                     </div>
                     
-                    <!-- Automação Selenium -->
-                    <div class="section">
-                        <h2>🤖 Automação Selenium</h2>
-                        <div class="input-group">
-                            <label for="hours-target">Horas Alvo:</label>
-                            <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
+                    <div class="status-summary-card">
+                        <div class="status-icon">📋</div>
+                        <div class="status-info">
+                            <div class="status-title">Chamado Vigente</div>
+                            <div class="status-value" id="workorder-summary">Carregando...</div>
                         </div>
-                        <div class="button-group">
-                            <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
-                            <button onclick="getRunningProcesses()">Ver Processos</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção de Capacidade Técnica (agora com destaque total) -->
+            <section class="section capacity-section">
+                <h2>📊 Capacidade Técnica - Período Vigente</h2>
+                
+                <div class="period-info" id="period-info">
+                    📅 Carregando período...
+                </div>
+                
+                <div class="capacity-grid">
+                    <div class="capacity-card capacity-bruta">
+                        <h3>Capacidade Bruta</h3>
+                        <div class="capacity-value" id="capacity-bruta">--</div>
+                        <div class="capacity-subtitle" id="capacity-bruta-subtitle">-- dias × 8h</div>
+                    </div>
+                    
+                    <div class="capacity-card capacity-exclusoes">
+                        <h3>Exclusões</h3>
+                        <div class="capacity-value" id="capacity-exclusoes">--</div>
+                        <div class="capacity-subtitle" id="capacity-exclusoes-subtitle">-- dias excluídos</div>
+                    </div>
+                    
+                    <div class="capacity-card capacity-liquida">
+                        <h3>Capacidade Líquida</h3>
+                        <div class="capacity-value" id="capacity-liquida">--</div>
+                        <div class="capacity-subtitle">Capacidade final</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendário de Produtividade -->
+            <section class="section calendar-section">
+                <h2>📅 Calendário de Produtividade - Período Vigente</h2>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-title" id="calendar-period">
+                            📅 Carregando período...
                         </div>
-                        <div id="automation-status" class="status-display">
-                            Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #d4ffdd; border-left: 4px solid #00b894;"></div>
+                                <span>Boa produtividade (6h+)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #fff3cd; border-left: 4px solid #ffc107;"></div>
+                                <span>Média (4-6h)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f8d7da; border-left: 4px solid #e74c3c;"></div>
+                                <span>Baixa (&lt;4h)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ffeaa7; border-left: 4px solid #fdcb6e;"></div>
+                                <span>Exclusão total (8h+)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f8f9fa;"></div>
+                                <span>Fim de semana</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Capacidade Técnica (Demo) -->
-                    <div class="section">
-                        <h2>📊 Capacidade Técnica (Demo)</h2>
-                        <div class="button-group">
-                            <button onclick="loadCapacitySimulation()" class="success">Ver Dashboard</button>
-                            <button onclick="window.open('/capacity/demo', '_blank')" class="warning">Ver Dados JSON</button>
-                        </div>
-                        <div id="capacity-simulation" class="status-display">
-                            Clique em "Ver Dashboard" para visualizar a demonstração de capacidade técnica do período 26->25.
+                    <div id="calendar-content">
+                        <div class="calendar-loading">
+                            <div class="loading-spinner"></div>
+                            <div>Carregando calendário...</div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Chamado Vigente (Coluna Direita) -->
-                <div class="section">
-                    <h2>📋 Chamado Vigente</h2>
-                    <div class="button-group">
-                        <button onclick="getCurrentWorkOrder()">Buscar Chamado</button>
-                        <button onclick="refreshWorkOrder()" class="warning">Atualizar Cache</button>
-                    </div>
-                    <div id="workorder-status" class="status-display">
-                        Clique em "Buscar Chamado" para obter o chamado vigente...
-                    </div>
+            </section>
+
+            <!-- Automação Selenium -->
+            <section class="section">
+                <h2>🤖 Automação Selenium</h2>
+                <div class="input-group">
+                    <label for="hours-target">Horas Alvo:</label>
+                    <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
                 </div>
-            </div>
-            
-            
+                <div class="button-group">
+                    <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
+                    <button onclick="getRunningProcesses()">Ver Processos</button>
+                </div>
+                <div id="automation-status" class="status-display">
+                    Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
+                </div>
+            </section>
+
             <!-- Logs em Tempo Real -->
-            <div class="section">
+            <section class="section">
                 <h2>📄 Logs da Aplicação</h2>
                 <div class="button-group">
                     <button onclick="clearLogs()" class="danger">Limpar Logs</button>
                     <button onclick="toggleAutoRefresh()" id="auto-refresh-btn">Auto-Refresh: OFF</button>
                 </div>
-                <div id="logs-display" class="status-display" style="max-height: 400px;">
+                <div id="logs-display" class="status-display logs-area">
                     Logs da aplicação aparecerão aqui...
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para detalhes do dia -->
+    <div id="day-modal" class="day-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-day-title">Detalhes do Dia</h2>
+                <span class="modal-close" onclick="closeDayModal()">&times;</span>
+            </div>
+            <div id="modal-day-content">
+                <div class="calendar-loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando detalhes...</div>
                 </div>
             </div>
         </div>
@@ -304,10 +790,19 @@
         let autoRefresh = false;
         let refreshInterval;
         
+        // Carregamento inicial da página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCapacityData();
+            loadSqlStatusSummary();
+            loadWorkorderSummary();
+            loadCalendarData();
+            addLog('Sistema iniciado', 'info');
+        });
+        
         // Utilitários
         function addLog(message, type = 'info') {
             const logsDiv = document.getElementById('logs-display');
-            if (!logsDiv) return; // Se a seção de logs não estiver presente
+            if (!logsDiv) return;
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
             logEntry.className = `status-item status-${type}`;
@@ -316,222 +811,107 @@
             logsDiv.scrollTop = logsDiv.scrollHeight;
         }
         
-        // Funções para carregamento do dashboard de capacidade
+        // Carregamento de dados de capacidade
         async function loadCapacityData() {
             try {
+                addLog('Carregando dados de capacidade...', 'info');
                 const response = await fetch('/capacity/demo');
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Usar o period_display fornecido diretamente pela API
-                    // Esta é a forma mais segura de exibir o período, já que é formatado pelo servidor
-                    const periodDisplay = data.period_display; // Já formatado como "26/07/2025 - 25/08/2025"
-                    
-                    // Formatação da data de referência
-                    const refDate = new Date(data.reference_date);
-                    const formatDate = (date) => {
-                        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-                    };
-                    
-                    // Atualizar elementos na interface
-                    document.getElementById('period-dates').textContent = periodDisplay;
-                    document.getElementById('reference-date').textContent = `Data de referência: ${formatDate(refDate)}`;
-                    document.getElementById('business-days').textContent = data.business_days;
-                    document.getElementById('capacity-hours').textContent = data.capacity_hours;
-                    document.getElementById('capacity-note').textContent = data.note;
-                    
-                    addLog(`Dados de capacidade carregados com sucesso: ${periodDisplay}`, 'success');
-                    console.log("Período recebido da API:", periodDisplay);
+                    updateCapacityDisplay(data);
+                    addLog('Dados de capacidade carregados com sucesso', 'success');
                 } else {
-                    document.getElementById('period-dates').textContent = 'Erro ao carregar dados';
-                    addLog(`Erro ao carregar dados de capacidade: ${data.error}`, 'error');
+                    throw new Error(data.error || 'Erro ao carregar dados de capacidade');
                 }
             } catch (error) {
-                document.getElementById('period-dates').textContent = 'Erro de conexão';
                 addLog(`Erro ao carregar capacidade: ${error.message}`, 'error');
+                console.error('Erro:', error);
             }
         }
         
-        async function loadCapacitySimulation() {
-            const capacitySection = document.getElementById('capacity-simulation');
-            capacitySection.innerHTML = '<div class="status-item status-info">Carregando formulário de simulação...</div>';
+        function updateCapacityDisplay(data) {
+            // Período
+            const periodStart = new Date(data.period_start).toLocaleDateString('pt-BR');
+            const periodEnd = new Date(data.period_end).toLocaleDateString('pt-BR');
+            document.getElementById('period-info').innerHTML = 
+                `📅 Período: ${periodStart} - ${periodEnd} (${data.business_days} dias úteis)`;
             
-            try {
-                capacitySection.innerHTML = `
-                    <h3 style="margin-bottom: 15px; color: #3498db;">🔄 Simular outra data</h3>
-                    <div style="margin: 20px auto; max-width: 300px; text-align: center;">
-                        <label for="ref-date" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Data de referência:</label>
-                        <input type="date" id="ref-date" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">
-                        <button onclick="simulateCapacity()" style="background: linear-gradient(45deg, #3498db, #2980b9); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Simular</button>
-                    </div>
-                    <div style="margin-top: 15px; text-align: center; font-size: 0.85em; color: #666;">
-                        Altere a data para ver como a capacidade técnica muda em diferentes períodos.
-                    </div>
-                `;
-                
-                // Inicializar data atual
-                const today = new Date();
-                document.getElementById('ref-date').value = today.toISOString().substring(0, 10);
-                
-            } catch (error) {
-                capacitySection.innerHTML = `<div class="status-item status-error">Erro ao carregar simulador: ${error.message}</div>`;
-            }
+            // Capacidade Bruta
+            document.getElementById('capacity-bruta').textContent = `${data.capacity_hours}h`;
+            document.getElementById('capacity-bruta-subtitle').textContent = `${data.business_days} dias × 8h`;
+            
+            // Exclusões
+            const excludedHours = data.excluded_hours || 0;
+            const excludedDays = data.excluded_days || 0;
+            document.getElementById('capacity-exclusoes').textContent = `${excludedHours}h`;
+            document.getElementById('capacity-exclusoes-subtitle').textContent = 
+                `${excludedDays.toFixed(1)} dias excluídos`;
+            
+            // Capacidade Líquida
+            const netCapacity = data.net_capacity_hours || data.capacity_hours;
+            document.getElementById('capacity-liquida').textContent = `${netCapacity}h`;
         }
         
-        async function simulateCapacity() {
-            const dateInput = document.getElementById('ref-date');
-            if (!dateInput || !dateInput.value) {
-                addLog('Data de referência inválida', 'error');
-                return;
-            }
-            
-            const refDate = dateInput.value;
-            addLog(`Simulando capacidade para ${refDate}...`, 'info');
-            
+        // Status SQL resumido
+        async function loadSqlStatusSummary() {
             try {
-                const response = await fetch(`/capacity/demo?reference=${refDate}`);
+                const response = await fetch('/status/sql-test');
                 const data = await response.json();
                 
-                if (response.ok) {
-                    // Usar o period_display fornecido pela API
-                    const periodDisplay = data.period_display;
-                    const refDate = new Date(data.reference_date);
-                    
-                    const formatDate = (date) => {
-                        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-                    };
-                    
-                    // Atualizar elementos na interface
-                    document.getElementById('period-dates').textContent = periodDisplay;
-                    document.getElementById('reference-date').textContent = `Data de referência: ${formatDate(refDate)}`;
-                    document.getElementById('business-days').textContent = data.business_days;
-                    document.getElementById('capacity-hours').textContent = data.capacity_hours;
-                    
-                    const capacitySection = document.getElementById('capacity-simulation');
-                    capacitySection.innerHTML = `
-                        <div class="status-item status-success">
-                            <h3>Simulação de Capacidade</h3>
-                            <p>Período: ${periodDisplay}</p>
-                            <p>Dias úteis: ${data.business_days}</p>
-                            <p>Capacidade total: ${data.capacity_hours} horas</p>
-                            <p>Data de referência: ${formatDate(refDate)}</p>
-                            <button onclick="loadCapacitySimulation()" style="margin-top: 10px; padding: 8px 15px;">Nova Simulação</button>
-                        </div>
-                    `;
-                    
-                    addLog(`Simulação de capacidade concluída para ${formatDate(refDate)}`, 'success');
+                const statusElement = document.getElementById('sql-status-summary');
+                if (data.status === 'success') {
+                    statusElement.textContent = 'Conectado';
+                    statusElement.className = 'status-value status-ok';
                 } else {
-                    const capacitySection = document.getElementById('capacity-simulation');
-                    capacitySection.innerHTML = `<div class="status-item status-error">Erro: ${data.error}</div>`;
-                    addLog(`Erro na simulação: ${data.error}`, 'error');
+                    statusElement.textContent = 'Erro';
+                    statusElement.className = 'status-value status-error';
                 }
             } catch (error) {
-                const capacitySection = document.getElementById('capacity-simulation');
-                capacitySection.innerHTML = `<div class="status-item status-error">Erro: ${error.message}</div>`;
-                addLog(`Erro de rede na simulação: ${error.message}`, 'error');
+                const statusElement = document.getElementById('sql-status-summary');
+                statusElement.textContent = 'Offline';
+                statusElement.className = 'status-value status-error';
             }
         }
         
-        function updateStatus(elementId, content, type = 'info') {
-            const element = document.getElementById(elementId);
-            element.innerHTML = `<div class="status-item status-${type}">${content}</div>`;
-        }
-        
-        function setButtonLoading(buttonId, loading = true) {
-            const button = document.getElementById(buttonId);
-            if (loading) {
-                button.disabled = true;
-                button.innerHTML += '<span class="loading"></span>';
-            } else {
-                button.disabled = false;
-                button.innerHTML = button.innerHTML.replace('<span class="loading"></span>', '');
-            }
-        }
-        
-        // Funções da API
-        async function testSqlConnection() {
-            addLog('Testando conexão com SQL Server...', 'info');
-            
+        // Chamado vigente resumido
+        async function loadWorkorderSummary() {
             try {
-                const response = await fetch('/status/sql');
+                const response = await fetch('/workorders/current');
                 const data = await response.json();
                 
-                if (data.sql_connected) {
-                    updateStatus('sql-status', 
-                        `✅ Conectado ao SQL Server<br>
-                         Latência: ${data.latency_ms}ms<br>
-                         Verificado em: ${new Date(data.checked_at).toLocaleString()}`, 
-                        'success');
-                    addLog('Conexão SQL estabelecida com sucesso', 'success');
+                const summaryElement = document.getElementById('workorder-summary');
+                if (data.workorder_id) {
+                    const date = data.created_time ? new Date(data.created_time).toLocaleDateString('pt-BR') : 'Data N/A';
+                    summaryElement.textContent = `#${data.workorder_id} - ${date}`;
+                    summaryElement.className = 'status-value status-ok';
                 } else {
-                    updateStatus('sql-status', 
-                        `❌ Falha na conexão<br>
-                         Erro: ${data.error || 'Erro desconhecido'}`, 
-                        'error');
-                    addLog(`Erro na conexão SQL: ${data.error}`, 'error');
+                    summaryElement.textContent = 'Nenhum chamado';
+                    summaryElement.className = 'status-value status-warning';
                 }
             } catch (error) {
-                updateStatus('sql-status', `❌ Erro de rede: ${error.message}`, 'error');
-                addLog(`Erro de rede ao testar SQL: ${error.message}`, 'error');
+                document.getElementById('workorder-summary').textContent = 'Erro ao carregar';
+                document.getElementById('workorder-summary').className = 'status-value status-error';
             }
         }
         
-        async function getCurrentWorkOrder(refresh = false) {
-            addLog('Buscando chamado vigente...', 'info');
-            
-            try {
-                const url = refresh ? '/workorders/current?refresh=true' : '/workorders/current';
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    updateStatus('workorder-status', 
-                        `📋 Chamado Encontrado<br>
-                         ID: ${data.workorder_id}<br>
-                         Título: ${data.title}<br>
-                         Owner: ${data.owner_id}<br>
-                         Fonte: ${data.source.toUpperCase()}<br>
-                         Atualizado: ${new Date(data.updated_at).toLocaleString()}`, 
-                        'success');
-                    addLog(`Chamado vigente: ${data.workorder_id} (${data.source})`, 'success');
-                } else {
-                    updateStatus('workorder-status', 
-                        `❌ Chamado não encontrado<br>
-                         Erro: ${data.error}`, 
-                        'error');
-                    addLog(`Erro ao buscar chamado: ${data.error}`, 'error');
-                }
-            } catch (error) {
-                updateStatus('workorder-status', `❌ Erro de rede: ${error.message}`, 'error');
-                addLog(`Erro de rede ao buscar chamado: ${error.message}`, 'error');
-            }
+        // Mostrar status detalhado
+        function showDetailedStatus() {
+            // Por enquanto, vamos usar um alert - depois pode ser uma modal ou página separada
+            alert('Funcionalidade de status detalhado será implementada em breve!\n\nPor enquanto, acesse:\n- Status SQL: /status/sql-test\n- Workorders: /workorders/current');
         }
         
-        async function refreshWorkOrder() {
-            addLog('Invalidando cache e atualizando chamado...', 'warning');
-            
-            try {
-                // Invalidar cache
-                await fetch('/workorders/cache/invalidate', { method: 'POST' });
-                addLog('Cache invalidado', 'info');
-                
-                // Buscar novamente
-                await getCurrentWorkOrder(true);
-            } catch (error) {
-                addLog(`Erro ao atualizar chamado: ${error.message}`, 'error');
-            }
-        }
-        
+        // Automação
         async function runAutomation() {
-            const hoursTarget = parseFloat(document.getElementById('hours-target').value);
+            const hoursTarget = document.getElementById('hours-target').value;
+            const statusDiv = document.getElementById('automation-status');
+            const button = document.getElementById('run-automation-btn');
             
-            if (isNaN(hoursTarget) || hoursTarget <= 0 || hoursTarget > 24) {
-                addLog('Horas alvo deve estar entre 0.1 e 24', 'error');
-                return;
-            }
+            button.disabled = true;
+            button.innerHTML = 'Executando... <span class="loading"></span>';
+            statusDiv.innerHTML = 'Iniciando automação...';
             
-            addLog(`Iniciando automação para ${hoursTarget}h...`, 'info');
-            setButtonLoading('run-automation-btn', true);
+            addLog(`Iniciando automação com meta de ${hoursTarget} horas`, 'info');
             
             try {
                 const response = await fetch('/automation/run', {
@@ -540,186 +920,371 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        hours_target: hoursTarget
+                        hours_target: parseFloat(hoursTarget),
+                        workorder_title: "{{ config.WORKORDER_TITLE }}",
+                        owner_id: {{ config.OWNER_ID }}
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    updateStatus('automation-status', 
-                        `🚀 Automação Iniciada<br>
-                         Execution ID: ${data.execution_id}<br>
-                         WorkOrder: ${data.workorder_id}<br>
-                         Horas Alvo: ${data.hours_target}<br>
-                         Iniciado em: ${new Date(data.started_at).toLocaleString()}`, 
-                        'success');
-                    addLog(`Automação iniciada - Execution: ${data.execution_id}`, 'success');
-                    
-                    // Monitorar progresso
-                    monitorAutomation(data.execution_id);
+                    statusDiv.innerHTML = `<div class="status-item status-success">${data.message}</div>`;
+                    addLog('Automação executada com sucesso', 'success');
                 } else {
-                    updateStatus('automation-status', 
-                        `❌ Falha ao iniciar automação<br>
-                         Erro: ${data.error}`, 
-                        'error');
+                    statusDiv.innerHTML = `<div class="status-item status-error">Erro: ${data.error}</div>`;
                     addLog(`Erro na automação: ${data.error}`, 'error');
                 }
             } catch (error) {
-                updateStatus('automation-status', `❌ Erro de rede: ${error.message}`, 'error');
-                addLog(`Erro de rede na automação: ${error.message}`, 'error');
+                statusDiv.innerHTML = `<div class="status-item status-error">Erro de conexão: ${error.message}</div>`;
+                addLog(`Erro de conexão: ${error.message}`, 'error');
             } finally {
-                setButtonLoading('run-automation-btn', false);
+                button.disabled = false;
+                button.innerHTML = 'Gerar Tarefas';
             }
         }
         
-        async function monitorAutomation(executionId) {
-            const checkStatus = async () => {
-                try {
-                    const response = await fetch(`/automation/result/${executionId}`);
-                    const data = await response.json();
-                    
-                    if (response.ok) {
-                        const status = data.status;
-                        let statusText = '';
-                        let statusType = 'info';
-                        
-                        switch (status) {
-                            case 'started':
-                            case 'running':
-                                statusText = '🔄 Executando...';
-                                statusType = 'info';
-                                setTimeout(checkStatus, 5000); // Check again in 5s
-                                break;
-                            case 'success':
-                                statusText = `✅ Concluído com sucesso! (${data.created_task_ids.length} tarefas criadas)`;
-                                statusType = 'success';
-                                
-                                // Adicionar detalhes das tarefas criadas
-                                if (data.created_task_ids && data.created_task_ids.length > 0) {
-                                    let taskDetails = '';
-                                    data.created_task_ids.forEach(task => {
-                                        taskDetails += `<br>Tarefa: ${task.task_id} - ${task.title} (Tempo gasto: ${task.time_spent}h)`;
-                                    });
-                                    statusText += taskDetails;
-                                    statusText += `<br>Cadastrada${data.created_task_ids.length > 1 ? 's' : ''} com sucesso no chamado: ${data.workorder_id}`;
-                                }
-                                break;
-                            case 'no_tasks_detected':
-                                statusText = '⚠️ Script executado mas nenhuma tarefa detectada';
-                                statusType = 'warning';
-                                break;
-                            case 'error':
-                                statusText = `❌ Erro: ${data.error}`;
-                                statusType = 'error';
-                                break;
-                            case 'not_found':
-                                statusText = '❓ Execution ID não encontrado';
-                                statusType = 'error';
-                                break;
-                        }
-                        
-                        let statusDisplay = '';
-                        if (status === 'success' && data.created_task_ids && data.created_task_ids.length > 0) {
-                            // Exibição detalhada para sucessos
-                            let taskList = '';
-                            data.created_task_ids.forEach(task => {
-                                taskList += `<br>📋 Tarefa: ${task.task_id} - ${task.title} (${task.time_spent}h)`;
-                            });
-                            
-                            statusDisplay = `🤖 Automação ✅ Concluído com sucesso! (${data.created_task_ids.length} tarefas criadas)${taskList}<br>
-                                           ✅ Cadastrada${data.created_task_ids.length > 1 ? 's' : ''} com sucesso no chamado: ${data.workorder_id}<br>
-                                           📊 Execution ID: ${executionId}<br>
-                                           🎯 Horas Alvo: ${data.hours_target}<br>
-                                           ⏰ Status: ${status.toUpperCase()}<br>
-                                           ${data.finished_at ? `🕐 Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`;
-                        } else {
-                            // Exibição padrão para outros status
-                            statusDisplay = `🤖 Automação ${statusText}<br>
-                                           Execution ID: ${executionId}<br>
-                                           WorkOrder: ${data.workorder_id}<br>
-                                           Horas Alvo: ${data.hours_target}<br>
-                                           Status: ${status.toUpperCase()}<br>
-                                           ${data.finished_at ? `Finalizado: ${new Date(data.finished_at).toLocaleString()}` : ''}`;
-                        }
-                        
-                        updateStatus('automation-status', statusDisplay, statusType);
-                        
-                        // Log detalhado separado para sucessos
-                        if (status === 'success' && data.created_task_ids && data.created_task_ids.length > 0) {
-                            let detailedLog = `✅ Automação concluída! ${data.created_task_ids.length} tarefa(s) criada(s):`;
-                            data.created_task_ids.forEach(task => {
-                                detailedLog += `\n• Tarefa: ${task.task_id} - ${task.title} (Tempo gasto: ${task.time_spent}h)`;
-                            });
-                            detailedLog += `\nCadastrada(s) com sucesso no chamado: ${data.workorder_id}`;
-                            addLog(detailedLog, statusType);
-                        } else {
-                            addLog(`Automação ${executionId}: ${statusText}`, statusType);
-                        }
-                    }
-                } catch (error) {
-                    addLog(`Erro ao monitorar automação: ${error.message}`, 'error');
-                }
-            };
-            
-            checkStatus();
-        }
-        
+        // Processos em execução
         async function getRunningProcesses() {
-            addLog('Consultando processos em execução...', 'info');
-            
             try {
-                const response = await fetch('/automation/processes');
+                addLog('Verificando processos em execução...', 'info');
+                const response = await fetch('/automation/status');
                 const data = await response.json();
                 
-                updateStatus('automation-status', 
-                    `📊 Processos de Automação<br>
-                     Total: ${data.total_processes}<br>
-                     ${Object.keys(data.processes).length > 0 ? 
-                       Object.entries(data.processes).map(([pid, proc]) => 
-                         `• ${pid}: WO ${proc.workorder_id} (${proc.status})`
-                       ).join('<br>') : 
-                       'Nenhum processo ativo'}`, 
-                    'info');
-                
-                addLog(`${data.total_processes} processos encontrados`, 'info');
+                const statusDiv = document.getElementById('automation-status');
+                if (data.processes && data.processes.length > 0) {
+                    statusDiv.innerHTML = data.processes.map(p => 
+                        `<div class="status-item status-info">PID: ${p.pid} - ${p.name}</div>`
+                    ).join('');
+                    addLog(`${data.processes.length} processo(s) encontrado(s)`, 'info');
+                } else {
+                    statusDiv.innerHTML = '<div class="status-item status-warning">Nenhum processo em execução</div>';
+                    addLog('Nenhum processo em execução', 'warning');
+                }
             } catch (error) {
-                addLog(`Erro ao consultar processos: ${error.message}`, 'error');
+                addLog(`Erro ao verificar processos: ${error.message}`, 'error');
             }
         }
         
+        // Logs
         function clearLogs() {
             document.getElementById('logs-display').innerHTML = 'Logs limpos...';
         }
         
         function toggleAutoRefresh() {
-            autoRefresh = !autoRefresh;
             const button = document.getElementById('auto-refresh-btn');
+            autoRefresh = !autoRefresh;
             
             if (autoRefresh) {
                 button.textContent = 'Auto-Refresh: ON';
                 button.className = 'success';
                 refreshInterval = setInterval(() => {
-                    getCurrentWorkOrder();
-                }, 30000); // Refresh every 30s
+                    loadCapacityData();
+                    loadSqlStatusSummary();
+                    loadWorkorderSummary();
+                }, 30000); // 30 segundos
                 addLog('Auto-refresh ativado (30s)', 'info');
             } else {
                 button.textContent = 'Auto-Refresh: OFF';
                 button.className = '';
-                if (refreshInterval) {
-                    clearInterval(refreshInterval);
-                }
+                clearInterval(refreshInterval);
                 addLog('Auto-refresh desativado', 'info');
             }
         }
         
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            addLog('Aplicação inicializada', 'success');
-            testSqlConnection();
-            getCurrentWorkOrder();
-            loadCapacityData(); // Carregar dados de capacidade na inicialização
-        });
+        // ========================================
+        // FUNÇÕES DO CALENDÁRIO DE PRODUTIVIDADE
+        // ========================================
+        
+        let selectedDay = null;
+        
+        // Carregamento de dados do calendário
+        async function loadCalendarData() {
+            try {
+                addLog('Carregando dados do calendário...', 'info');
+                const response = await fetch('/calendar/data');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'API retornou success: false');
+                }
+                
+                if (!result.data || !result.data.weeks_data) {
+                    throw new Error('Dados do calendário inválidos: weeks_data ausente');
+                }
+                
+                updateCalendarDisplay(result.data);
+                addLog('Calendário carregado com sucesso', 'success');
+                
+            } catch (error) {
+                const errorMessage = `Erro ao carregar calendário: ${error.message}`;
+                addLog(errorMessage, 'error');
+                console.error('Erro detalhado:', error);
+                showCalendarError();
+            }
+        }
+        
+        function updateCalendarDisplay(data) {
+            try {
+                // Atualizar título do período
+                const periodElement = document.getElementById('calendar-period');
+                if (periodElement) {
+                    const startDate = new Date(data.period_start).toLocaleDateString('pt-BR');
+                    const endDate = new Date(data.period_end).toLocaleDateString('pt-BR');
+                    periodElement.textContent = `📅 ${startDate} - ${endDate}`;
+                } else {
+                    console.error('Elemento calendar-period não encontrado');
+                }
+                
+                // Construir HTML do calendário
+                const calendarHtml = buildCalendarHTML(data.weeks_data);
+                
+                const calendarContent = document.getElementById('calendar-content');
+                if (calendarContent) {
+                    calendarContent.innerHTML = calendarHtml;
+                } else {
+                    console.error('Elemento calendar-content não encontrado');
+                    throw new Error('Elemento calendar-content não encontrado no DOM');
+                }
+            } catch (error) {
+                console.error('Erro em updateCalendarDisplay:', error);
+                throw error; // Re-throw para ser capturado pela função que chama
+            }
+        }
+        
+        function buildCalendarHTML(weeksData) {
+            try {
+                if (!weeksData || !Array.isArray(weeksData)) {
+                    console.error('weeksData inválido:', weeksData);
+                    return '<div class="calendar-loading"><div style="color: #e74c3c;">Dados do calendário inválidos</div></div>';
+                }
+                
+                const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                
+                let html = '<div class="calendar-grid">';
+                
+                // Cabeçalho dos dias da semana
+                html += '<div class="calendar-weekdays">';
+                weekdays.forEach(day => {
+                    html += `<div class="weekday-header">${day}</div>`;
+                });
+                html += '</div>';
+                
+                // Semanas
+                html += '<div class="calendar-weeks">';
+                weeksData.forEach((week, weekIndex) => {
+                    if (!Array.isArray(week)) {
+                        console.error(`Semana ${weekIndex} inválida:`, week);
+                        return; // Pular semana inválida
+                    }
+                    
+                    html += '<div class="calendar-week">';
+                    week.forEach((day, dayIndex) => {
+                        try {
+                            if (!day || typeof day !== 'object') {
+                                console.error(`Dia ${dayIndex} da semana ${weekIndex} inválido:`, day);
+                                html += '<div class="calendar-day error"><div class="day-number">?</div></div>';
+                                return;
+                            }
+                            
+                            // Valores seguros com fallbacks
+                            const dateStr = day.date || 'N/A';
+                            const dayNumber = dateStr !== 'N/A' ? new Date(dateStr + 'T00:00:00').getDate() : '?';
+                            const colorClass = day.calendar_color || 'none';
+                            const isOutOfPeriod = day.out_of_period === true;
+                            
+                            html += `<div class="calendar-day ${colorClass}" data-date="${dateStr}">`;
+                            html += `<div class="day-number">${dayNumber}</div>`;
+                            
+                            if (!isOutOfPeriod && !day.is_weekend) {
+                                html += '<div class="day-info">';
+                                
+                                if (day.tasks_count && day.tasks_count > 0) {
+                                    html += `<div class="task-count">${day.tasks_count} tarefa${day.tasks_count > 1 ? 's' : ''}</div>`;
+                                }
+                                
+                                if (day.hours_worked && parseFloat(day.hours_worked) > 0) {
+                                    const hoursWorked = parseFloat(day.hours_worked);
+                                    html += `<div class="hours-worked">${hoursWorked.toFixed(1)}h</div>`;
+                                }
+                                
+                                if (day.hours_excluded && parseFloat(day.hours_excluded) > 0) {
+                                    const hoursExcluded = parseFloat(day.hours_excluded);
+                                    html += `<div class="hours-excluded" style="color: #e74c3c;">-${hoursExcluded}h</div>`;
+                                }
+                                
+                                html += '</div>';
+                            } else if (day.is_weekend) {
+                                html += '<div class="day-info"><div style="color: #6c757d;">Fim de semana</div></div>';
+                            }
+                            
+                            html += '</div>';
+                        } catch (dayError) {
+                            console.error(`Erro ao processar dia ${dayIndex} da semana ${weekIndex}:`, dayError, day);
+                            html += '<div class="calendar-day error"><div class="day-number">?</div></div>';
+                        }
+                    });
+                    html += '</div>';
+                });
+                html += '</div>';
+                html += '</div>';
+                
+                return html;
+            } catch (error) {
+                console.error('Erro ao construir HTML do calendário:', error);
+                return '<div class="calendar-loading"><div style="color: #e74c3c;">Erro ao construir calendário</div></div>';
+            }
+        }
+        
+        function showCalendarError() {
+            document.getElementById('calendar-content').innerHTML = `
+                <div class="calendar-loading">
+                    <div style="color: #e74c3c; margin-bottom: 10px;">❌ Erro ao carregar calendário</div>
+                    <button onclick="loadCalendarData()" style="padding: 8px 16px; border: none; background: #3498db; color: white; border-radius: 4px; cursor: pointer;">
+                        Tentar novamente
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Modal de detalhes do dia
+        async function openDayModal(dateStr) {
+            const modal = document.getElementById('day-modal');
+            const titleElement = document.getElementById('modal-day-title');
+            const contentElement = document.getElementById('modal-day-content');
+            
+            // Mostrar modal com loading
+            const formattedDate = new Date(dateStr).toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            titleElement.textContent = `Detalhes - ${formattedDate}`;
+            
+            contentElement.innerHTML = `
+                <div class="calendar-loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando detalhes do dia...</div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+            selectedDay = dateStr;
+            
+            // Marcar dia selecionado no calendário
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+            document.querySelector(`[data-date="${dateStr}"]`)?.classList.add('selected');
+            
+            try {
+                const response = await fetch(`/calendar/day/${dateStr}`);
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    displayDayDetails(result.day_data);
+                } else {
+                    throw new Error(result.error || 'Erro ao carregar detalhes do dia');
+                }
+            } catch (error) {
+                contentElement.innerHTML = `
+                    <div style="text-align: center; color: #e74c3c; padding: 20px;">
+                        <div style="margin-bottom: 10px;">❌ Erro ao carregar detalhes</div>
+                        <div style="font-size: 0.9em; margin-bottom: 15px;">${error.message}</div>
+                        <button onclick="openDayModal('${dateStr}')" style="padding: 8px 16px; border: none; background: #3498db; color: white; border-radius: 4px; cursor: pointer;">
+                            Tentar novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayDayDetails(dayData) {
+            const contentElement = document.getElementById('modal-day-content');
+            
+            if (!dayData || Object.keys(dayData).length === 0) {
+                contentElement.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #6c757d;">
+                        📝 Nenhum dados encontrado para este dia
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            // Resumo do dia
+            html += '<div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">';
+            html += '<h3 style="margin-bottom: 10px;">📊 Resumo do Dia</h3>';
+            html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">';
+            html += `<div><strong>Tarefas:</strong> ${dayData.tasks_count || 0}</div>`;
+            html += `<div><strong>Horas trabalhadas:</strong> ${(dayData.hours_worked || 0).toFixed(1)}h</div>`;
+            
+            if (dayData.hours_excluded > 0) {
+                html += `<div><strong>Horas excluídas:</strong> ${dayData.hours_excluded}h</div>`;
+                html += `<div><strong>Tipo de exclusão:</strong> ${dayData.exclusion_type === 'total' ? 'Total (8h+)' : 'Parcial'}</div>`;
+            }
+            
+            html += '</div></div>';
+            
+            // Lista de tarefas
+            if (dayData.tasks && dayData.tasks.length > 0) {
+                html += '<h3 style="margin-bottom: 15px;">📋 Tarefas do Dia</h3>';
+                dayData.tasks.forEach(task => {
+                    html += '<div class="task-item">';
+                    html += `<div class="task-title">${task.TaskTitle || 'Título não disponível'}</div>`;
+                    html += '<div class="task-details">';
+                    html += `<div><strong>Tempo estimado:</strong> ${(task.TempoEstimado || 0).toFixed(1)}h</div>`;
+                    html += `<div><strong>Tempo gasto:</strong> ${(task.TempoGasto || 0).toFixed(1)}h</div>`;
+                    if (task.ComplexidadeLabel) {
+                        html += `<div><strong>Complexidade:</strong> ${task.ComplexidadeLabel}</div>`;
+                    }
+                    html += `<div><strong>ID da tarefa:</strong> ${task.TASKID}</div>`;
+                    html += '</div></div>';
+                });
+            } else {
+                html += '<div style="text-align: center; padding: 20px; color: #6c757d;">📝 Nenhuma tarefa encontrada para este dia</div>';
+            }
+            
+            // Lista de exclusões
+            if (dayData.exclusions && dayData.exclusions.length > 0) {
+                html += '<h3 style="margin-bottom: 15px; margin-top: 20px;">🚫 Exclusões do Dia</h3>';
+                dayData.exclusions.forEach(exclusion => {
+                    html += '<div style="background: #fff3cd; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid #ffc107;">';
+                    html += `<div><strong>Motivo:</strong> ${exclusion.reason || 'Não informado'}</div>`;
+                    html += `<div><strong>Horas:</strong> ${exclusion.hours}h</div>`;
+                    html += `<div><strong>Tipo:</strong> ${exclusion.type === 'total' ? 'Exclusão total' : 'Exclusão parcial'}</div>`;
+                    html += '</div>';
+                });
+            }
+            
+            contentElement.innerHTML = html;
+        }
+        
+        function closeDayModal() {
+            const modal = document.getElementById('day-modal');
+            modal.style.display = 'none';
+            selectedDay = null;
+            
+            // Remover seleção do calendário
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+        }
+        
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('day-modal');
+            if (event.target === modal) {
+                closeDayModal();
+            }
+        }
     </script>
 </body>
 </html>

@@ -42,13 +42,19 @@ app.config.update({
 from app.routes.status import status_bp
 from app.routes.workorders import workorders_bp
 from app.routes.automation import automation_bp
-from app.routes.capacity_demo import capacity_demo_bp  # novo blueprint
+from app.routes.capacity import capacity_bp  # rota atualizada
+from app.routes.exclusions import exclusions_bp
+from app.routes.status_page import status_page_bp
+from app.routes.calendar import calendar_bp
 
 # Registrar blueprints
 app.register_blueprint(status_bp, url_prefix='/status')
 app.register_blueprint(workorders_bp, url_prefix='/workorders')
 app.register_blueprint(automation_bp, url_prefix='/automation')
-app.register_blueprint(capacity_demo_bp, url_prefix='/capacity')  # rota demo
+app.register_blueprint(capacity_bp, url_prefix='/capacity')
+app.register_blueprint(exclusions_bp)  # sem prefixo para rotas diretas
+app.register_blueprint(status_page_bp)  # página de status detalhado
+app.register_blueprint(calendar_bp)  # rotas do calendário
 
 @app.route('/')
 def index():

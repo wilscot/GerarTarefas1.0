@@ -60,18 +60,36 @@ def count_business_days(start: date, end: date) -> int:
 def compute_capacity_for_current_period(today: date | None = None) -> Dict[str, Any]:
     """
     Calcula o período vigente, dias úteis e capacidade (horas úteis = dias * 8).
-    Não considera feriados nem exclusões.
+    Agora inclui cálculo de capacidade líquida considerando exclusões.
     """
     start, end = get_current_26_25_period(today)
     business_days = count_business_days(start, end)
     capacity_hours = business_days * HOURS_PER_WORKDAY
     ref = today or date.today()
+    
+    # Calcular exclusões
+    try:
+        from app.services.exclusion_service import ExclusionService
+        exclusion_service = ExclusionService()
+        exclusions = exclusion_service.get_exclusions_for_period(today)
+        total_excluded_hours = sum(e["hours"] for e in exclusions)
+        excluded_days = total_excluded_hours / HOURS_PER_WORKDAY
+        net_capacity_hours = capacity_hours - total_excluded_hours
+    except Exception:
+        # Se houver erro ao carregar exclusões, continua sem elas
+        total_excluded_hours = 0
+        excluded_days = 0
+        net_capacity_hours = capacity_hours
+    
     return {
         "period_start": start.isoformat(),
         "period_end": end.isoformat(),
         "business_days": business_days,
         "hours_per_day": HOURS_PER_WORKDAY,
         "capacity_hours": capacity_hours,
+        "excluded_hours": total_excluded_hours,
+        "excluded_days": excluded_days,
+        "net_capacity_hours": net_capacity_hours,
         "reference_date": ref.isoformat(),
         "note": "Período fixo 26->25, considera apenas seg-sex, 8h/dia, sem feriados."
     }
