@@ -189,11 +189,15 @@
         <div class="header">
             <h1>🚀 ServiceDesk Automations</h1>
             <p>Fase 1: Foundation & Core Logic</p>
+            <!-- Links diretos para depuração -->
+            <div style="margin-top: 10px; font-size: 0.8em;">
+                <a href="/" style="color: white; margin: 0 10px;">Home</a>
+            </div>
         </div>
         
         <div class="main-content">
-            <div class="grid">
-                <!-- Status SQL -->
+            <div class="grid" style="grid-template-columns: 1fr 2fr 1fr; gap: 20px;">
+                <!-- Status SQL (Coluna Esquerda) -->
                 <div class="section">
                     <h2>📊 Status SQL Server</h2>
                     <div class="button-group">
@@ -204,7 +208,71 @@
                     </div>
                 </div>
                 
-                <!-- WorkOrder Atual -->
+                <!-- Coluna Central -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Período Vigente -->
+                    <div class="section">
+                        <h2>� Período Vigente</h2>
+                        <div style="background: #f1f2f6; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+                            <h3 style="color: #3498db; margin-bottom: 10px;">Período 26 a 25</h3>
+                            <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;" id="period-dates">
+                                Carregando...
+                            </div>
+                            <div style="margin-top: 8px; color: #7f8c8d; font-size: 0.85em; font-style: italic;" id="reference-date">
+                                Data de referência: Carregando...
+                            </div>
+                        </div>
+                        
+                        <!-- Dados de Capacidade -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                                <h3 style="color: #3498db; margin-bottom: 15px; font-size: 1.2em;">Dias Úteis</h3>
+                                <div style="font-size: 2.8em; font-weight: bold; color: #2c3e50; margin-bottom: 10px;" id="business-days">0</div>
+                                <div style="color: #7f8c8d; font-size: 0.9em;">dias (seg-sex)</div>
+                            </div>
+                            
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                                <h3 style="color: #3498db; margin-bottom: 15px; font-size: 1.2em;">Capacidade Total</h3>
+                                <div style="font-size: 2.8em; font-weight: bold; color: #2c3e50; margin-bottom: 10px;" id="capacity-hours">0</div>
+                                <div style="color: #7f8c8d; font-size: 0.9em;">horas (8h/dia)</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; text-align: center; font-size: 0.85em; color: #666;" id="capacity-note">
+                            Período fixo 26->25, considera apenas seg-sex, 8h/dia, sem feriados.
+                        </div>
+                    </div>
+                    
+                    <!-- Automação Selenium -->
+                    <div class="section">
+                        <h2>🤖 Automação Selenium</h2>
+                        <div class="input-group">
+                            <label for="hours-target">Horas Alvo:</label>
+                            <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
+                        </div>
+                        <div class="button-group">
+                            <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
+                            <button onclick="getRunningProcesses()">Ver Processos</button>
+                        </div>
+                        <div id="automation-status" class="status-display">
+                            Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
+                        </div>
+                    </div>
+                    
+                    <!-- Capacidade Técnica (Demo) -->
+                    <div class="section">
+                        <h2>📊 Capacidade Técnica (Demo)</h2>
+                        <div class="button-group">
+                            <button onclick="loadCapacitySimulation()" class="success">Ver Dashboard</button>
+                            <button onclick="window.open('/capacity/demo', '_blank')" class="warning">Ver Dados JSON</button>
+                        </div>
+                        <div id="capacity-simulation" class="status-display">
+                            Clique em "Ver Dashboard" para visualizar a demonstração de capacidade técnica do período 26->25.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chamado Vigente (Coluna Direita) -->
                 <div class="section">
                     <h2>📋 Chamado Vigente</h2>
                     <div class="button-group">
@@ -217,21 +285,6 @@
                 </div>
             </div>
             
-            <!-- Automação -->
-            <div class="section">
-                <h2>🤖 Automação Selenium</h2>
-                <div class="input-group">
-                    <label for="hours-target">Horas Alvo:</label>
-                    <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
-                </div>
-                <div class="button-group">
-                    <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
-                    <button onclick="getRunningProcesses()">Ver Processos</button>
-                </div>
-                <div id="automation-status" class="status-display">
-                    Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
-                </div>
-            </div>
             
             <!-- Logs em Tempo Real -->
             <div class="section">
@@ -254,12 +307,129 @@
         // Utilitários
         function addLog(message, type = 'info') {
             const logsDiv = document.getElementById('logs-display');
+            if (!logsDiv) return; // Se a seção de logs não estiver presente
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
             logEntry.className = `status-item status-${type}`;
             logEntry.innerHTML = `[${timestamp}] ${message}`;
             logsDiv.appendChild(logEntry);
             logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        // Funções para carregamento do dashboard de capacidade
+        async function loadCapacityData() {
+            try {
+                const response = await fetch('/capacity/demo');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Usar o period_display fornecido diretamente pela API
+                    // Esta é a forma mais segura de exibir o período, já que é formatado pelo servidor
+                    const periodDisplay = data.period_display; // Já formatado como "26/07/2025 - 25/08/2025"
+                    
+                    // Formatação da data de referência
+                    const refDate = new Date(data.reference_date);
+                    const formatDate = (date) => {
+                        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+                    };
+                    
+                    // Atualizar elementos na interface
+                    document.getElementById('period-dates').textContent = periodDisplay;
+                    document.getElementById('reference-date').textContent = `Data de referência: ${formatDate(refDate)}`;
+                    document.getElementById('business-days').textContent = data.business_days;
+                    document.getElementById('capacity-hours').textContent = data.capacity_hours;
+                    document.getElementById('capacity-note').textContent = data.note;
+                    
+                    addLog(`Dados de capacidade carregados com sucesso: ${periodDisplay}`, 'success');
+                    console.log("Período recebido da API:", periodDisplay);
+                } else {
+                    document.getElementById('period-dates').textContent = 'Erro ao carregar dados';
+                    addLog(`Erro ao carregar dados de capacidade: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                document.getElementById('period-dates').textContent = 'Erro de conexão';
+                addLog(`Erro ao carregar capacidade: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadCapacitySimulation() {
+            const capacitySection = document.getElementById('capacity-simulation');
+            capacitySection.innerHTML = '<div class="status-item status-info">Carregando formulário de simulação...</div>';
+            
+            try {
+                capacitySection.innerHTML = `
+                    <h3 style="margin-bottom: 15px; color: #3498db;">🔄 Simular outra data</h3>
+                    <div style="margin: 20px auto; max-width: 300px; text-align: center;">
+                        <label for="ref-date" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Data de referência:</label>
+                        <input type="date" id="ref-date" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">
+                        <button onclick="simulateCapacity()" style="background: linear-gradient(45deg, #3498db, #2980b9); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Simular</button>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center; font-size: 0.85em; color: #666;">
+                        Altere a data para ver como a capacidade técnica muda em diferentes períodos.
+                    </div>
+                `;
+                
+                // Inicializar data atual
+                const today = new Date();
+                document.getElementById('ref-date').value = today.toISOString().substring(0, 10);
+                
+            } catch (error) {
+                capacitySection.innerHTML = `<div class="status-item status-error">Erro ao carregar simulador: ${error.message}</div>`;
+            }
+        }
+        
+        async function simulateCapacity() {
+            const dateInput = document.getElementById('ref-date');
+            if (!dateInput || !dateInput.value) {
+                addLog('Data de referência inválida', 'error');
+                return;
+            }
+            
+            const refDate = dateInput.value;
+            addLog(`Simulando capacidade para ${refDate}...`, 'info');
+            
+            try {
+                const response = await fetch(`/capacity/demo?reference=${refDate}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Usar o period_display fornecido pela API
+                    const periodDisplay = data.period_display;
+                    const refDate = new Date(data.reference_date);
+                    
+                    const formatDate = (date) => {
+                        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+                    };
+                    
+                    // Atualizar elementos na interface
+                    document.getElementById('period-dates').textContent = periodDisplay;
+                    document.getElementById('reference-date').textContent = `Data de referência: ${formatDate(refDate)}`;
+                    document.getElementById('business-days').textContent = data.business_days;
+                    document.getElementById('capacity-hours').textContent = data.capacity_hours;
+                    
+                    const capacitySection = document.getElementById('capacity-simulation');
+                    capacitySection.innerHTML = `
+                        <div class="status-item status-success">
+                            <h3>Simulação de Capacidade</h3>
+                            <p>Período: ${periodDisplay}</p>
+                            <p>Dias úteis: ${data.business_days}</p>
+                            <p>Capacidade total: ${data.capacity_hours} horas</p>
+                            <p>Data de referência: ${formatDate(refDate)}</p>
+                            <button onclick="loadCapacitySimulation()" style="margin-top: 10px; padding: 8px 15px;">Nova Simulação</button>
+                        </div>
+                    `;
+                    
+                    addLog(`Simulação de capacidade concluída para ${formatDate(refDate)}`, 'success');
+                } else {
+                    const capacitySection = document.getElementById('capacity-simulation');
+                    capacitySection.innerHTML = `<div class="status-item status-error">Erro: ${data.error}</div>`;
+                    addLog(`Erro na simulação: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                const capacitySection = document.getElementById('capacity-simulation');
+                capacitySection.innerHTML = `<div class="status-item status-error">Erro: ${error.message}</div>`;
+                addLog(`Erro de rede na simulação: ${error.message}`, 'error');
+            }
         }
         
         function updateStatus(elementId, content, type = 'info') {
@@ -548,6 +718,7 @@
             addLog('Aplicação inicializada', 'success');
             testSqlConnection();
             getCurrentWorkOrder();
+            loadCapacityData(); // Carregar dados de capacidade na inicialização
         });
     </script>
 </body>

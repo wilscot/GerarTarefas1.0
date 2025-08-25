@@ -42,11 +42,13 @@ app.config.update({
 from app.routes.status import status_bp
 from app.routes.workorders import workorders_bp
 from app.routes.automation import automation_bp
+from app.routes.capacity_demo import capacity_demo_bp  # novo blueprint
 
 # Registrar blueprints
 app.register_blueprint(status_bp, url_prefix='/status')
 app.register_blueprint(workorders_bp, url_prefix='/workorders')
 app.register_blueprint(automation_bp, url_prefix='/automation')
+app.register_blueprint(capacity_demo_bp, url_prefix='/capacity')  # rota demo
 
 @app.route('/')
 def index():
