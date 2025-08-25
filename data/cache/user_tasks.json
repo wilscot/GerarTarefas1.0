@@ -1,0 +1,130 @@
+{
+  "data": {
+    "user_tasks": [
+      {
+        "task_number": 55358,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-25 15:07:30",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 55296,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-25 14:09:20",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 55279,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-25 13:43:02",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 55254,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-25 13:05:31",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54739,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 14:40:21",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54735,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 14:33:56",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54475,
+        "title": "Reunião com COTIN sobre virtualização",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 09:54:21",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54473,
+        "title": "Aplicar patch de segurança ESXi",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 09:54:06",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54472,
+        "title": "Redistribuir VMs entre Storage B e Storage C",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 09:53:52",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      },
+      {
+        "task_number": 54471,
+        "title": "Migrar VMs entre datastores",
+        "state": 1,
+        "priority": 3,
+        "opened_at": "2025-08-22 09:53:38",
+        "resolved_at": null,
+        "time_spent": 0.0,
+        "time_estimated": 0.0,
+        "state_label": "Em Andamento",
+        "priority_label": "Não Definida"
+      }
+    ],
+    "username": "wfrancischini",
+    "last_updated": "2025-08-25T17:24:59.427875",
+    "total_records": 10
+  },
+  "cached_at": "2025-08-25T17:24:59.427916"
+}

@@ -81,4 +81,12 @@ def handle_generic_exception(e):
     }), 500
 
 if __name__ == '__main__':
+    # Registrar startup do sistema
+    try:
+        from app.services.execution_cache_service import execution_cache_service
+        execution_cache_service.record_system_startup()
+        app.logger.info("Sistema iniciado e startup registrado no cache")
+    except Exception as e:
+        app.logger.warning(f"Erro ao registrar startup: {e}")
+    
     app.run(host='127.0.0.1', port=5000, debug=True)

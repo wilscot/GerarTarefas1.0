@@ -1,0 +1,28 @@
+{
+  "last_automation": {
+    "data": {
+      "status": "started",
+      "timestamp": "2025-08-25T15:07:07.940071",
+      "details": {
+        "workorder_id": 549599,
+        "hours_target": 1.0,
+        "title": "CSI EAST - Datacenter - Execução de Tarefas"
+      }
+    },
+    "last_updated": "2025-08-25T15:07:07.940286"
+  },
+  "automation_history": {
+    "data": [
+      {
+        "status": "started",
+        "timestamp": "2025-08-25T15:07:07.940071",
+        "details": {
+          "workorder_id": 549599,
+          "hours_target": 1.0,
+          "title": "CSI EAST - Datacenter - Execução de Tarefas"
+        }
+      }
+    ],
+    "last_updated": "2025-08-25T15:07:07.942003"
+  }
+}

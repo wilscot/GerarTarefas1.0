@@ -220,9 +220,35 @@
         }
         
         .calendar-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             font-size: 1.2em;
             font-weight: bold;
             color: #2c3e50;
+        }
+        
+        .calendar-refresh-btn {
+            padding: 6px 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .calendar-refresh-btn:hover {
+            background: #2980b9;
+        }
+        
+        .calendar-refresh-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
         }
         
         .calendar-legend {
@@ -493,6 +519,17 @@
             gap: 15px;
             flex-wrap: wrap;
             margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .last-execution-info {
+            margin-left: 10px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .last-execution-info small {
+            font-size: 11px;
         }
         
         button {
@@ -565,6 +602,116 @@
             background: #f8d7da;
             border-left-color: #dc3545;
             color: #721c24;
+        }
+        
+        /* Estilos para tarefas do usuário */
+        .user-tasks-container {
+            margin-top: 20px;
+        }
+        
+        .loading-placeholder {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .user-task-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-number {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        .task-title {
+            color: #555;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        
+        .task-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .state-novo { background: #e3f2fd; color: #1976d2; }
+        .state-andamento { background: #fff3e0; color: #f57c00; }
+        .state-resolvido { background: #e8f5e8; color: #388e3c; }
+        .state-fechado { background: #f3e5f5; color: #7b1fa2; }
+        .state-cancelado { background: #ffebee; color: #d32f2f; }
+        
+        .priority-critica { background: #ffcdd2; color: #c62828; }
+        .priority-alta { background: #ffe0b2; color: #ef6c00; }
+        .priority-moderada { background: #fff9c4; color: #f9a825; }
+        .priority-baixa { background: #e1f5fe; color: #0277bd; }
+        .priority-planejamento { background: #f3e5f5; color: #8e24aa; }
+        
+        .task-time {
+            text-align: right;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .tasks-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.9;
         }
         
         .logs-area {
@@ -705,7 +852,10 @@
                 <div class="calendar-container">
                     <div class="calendar-header">
                         <div class="calendar-title" id="calendar-period">
-                            📅 Carregando período...
+                            <span>📅 Carregando período...</span>
+                            <button id="calendar-refresh-btn" class="calendar-refresh-btn" onclick="refreshCalendar()">
+                                🔄 Atualizar
+                            </button>
                         </div>
                         <div class="calendar-legend">
                             <div class="legend-item">
@@ -749,10 +899,27 @@
                 </div>
                 <div class="button-group">
                     <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
+                    <span class="last-execution-info" id="last-execution-info">
+                        <small>🕒 Última execução: <span id="last-execution-time">Nunca</span></small>
+                    </span>
                     <button onclick="getRunningProcesses()">Ver Processos</button>
                 </div>
                 <div id="automation-status" class="status-display">
                     Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
+                </div>
+            </section>
+
+            <!-- Minhas Últimas Tarefas -->
+            <section class="section">
+                <h2>📋 Minhas Últimas Tarefas</h2>
+                <div class="button-group">
+                    <button onclick="loadUserTasks()" class="info" id="load-tasks-btn">🔄 Atualizar Tarefas</button>
+                    <button onclick="toggleTasksView()" class="secondary" id="toggle-view-btn">📊 Ver Resumo</button>
+                </div>
+                <div id="user-tasks-container" class="user-tasks-container">
+                    <div class="loading-placeholder">
+                        Carregando suas últimas tarefas...
+                    </div>
                 </div>
             </section>
 
@@ -941,6 +1108,8 @@
             } finally {
                 button.disabled = false;
                 button.innerHTML = 'Gerar Tarefas';
+                // Recarregar informação da última execução
+                loadLastExecution();
             }
         }
         
@@ -998,6 +1167,48 @@
         
         let selectedDay = null;
         
+        // Função para atualização manual do calendário
+        async function refreshCalendar() {
+            const button = document.getElementById('calendar-refresh-btn');
+            if (!button) return;
+            
+            // Desabilitar botão durante refresh
+            button.disabled = true;
+            button.innerHTML = '⏳ Atualizando...';
+            
+            try {
+                addLog('Forçando atualização do calendário...', 'info');
+                const response = await fetch('/calendar/data?force_refresh=true');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'API retornou success: false');
+                }
+                
+                if (!result.data || !result.data.weeks_data) {
+                    throw new Error('Dados do calendário inválidos: weeks_data ausente');
+                }
+                
+                updateCalendarDisplay(result.data);
+                addLog('Calendário atualizado com sucesso! ✅', 'success');
+                
+            } catch (error) {
+                const errorMessage = `Erro ao atualizar calendário: ${error.message}`;
+                addLog(errorMessage, 'error');
+                console.error('Erro detalhado:', error);
+                showCalendarError();
+            } finally {
+                // Reabilitar botão
+                button.disabled = false;
+                button.innerHTML = '🔄 Atualizar';
+            }
+        }
+        
         // Carregamento de dados do calendário
         async function loadCalendarData() {
             try {
@@ -1036,7 +1247,10 @@
                 if (periodElement) {
                     const startDate = new Date(data.period_start).toLocaleDateString('pt-BR');
                     const endDate = new Date(data.period_end).toLocaleDateString('pt-BR');
-                    periodElement.textContent = `📅 ${startDate} - ${endDate}`;
+                    const spanElement = periodElement.querySelector('span');
+                    if (spanElement) {
+                        spanElement.textContent = `📅 ${startDate} - ${endDate}`;
+                    }
                 } else {
                     console.error('Elemento calendar-period não encontrado');
                 }
@@ -1285,6 +1499,192 @@
                 closeDayModal();
             }
         }
+
+        // Função para carregar e exibir última execução
+        async function loadLastExecution() {
+            try {
+                const response = await fetch('/automation/execution/last');
+                const data = await response.json();
+                
+                const lastExecutionSpan = document.getElementById('last-execution-time');
+                
+                if (data.success && data.last_execution) {
+                    const timestamp = new Date(data.last_execution.timestamp);
+                    const timeStr = timestamp.toLocaleString('pt-BR');
+                    const status = data.last_execution.status;
+                    
+                    let statusIcon = '';
+                    switch(status) {
+                        case 'completed': statusIcon = '✅'; break;
+                        case 'failed': statusIcon = '❌'; break;
+                        case 'started': statusIcon = '🔄'; break;
+                        default: statusIcon = '⏸️';
+                    }
+                    
+                    lastExecutionSpan.innerHTML = `${statusIcon} ${timeStr} (${status})`;
+                } else {
+                    lastExecutionSpan.innerHTML = 'Nunca';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar última execução:', error);
+                document.getElementById('last-execution-time').innerHTML = 'Erro';
+            }
+        }
+
+        // Carregar última execução quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLastExecution();
+            loadUserTasks(); // Carregar tarefas do usuário também
+        });
+
+        // Variável para controlar visualização (lista ou resumo)
+        let showingTasksSummary = false;
+
+        // Função para carregar tarefas do usuário
+        async function loadUserTasks(forceRefresh = false) {
+            try {
+                const container = document.getElementById('user-tasks-container');
+                const loadButton = document.getElementById('load-tasks-btn');
+                
+                loadButton.disabled = true;
+                loadButton.innerHTML = '⏳ Carregando...';
+                
+                container.innerHTML = '<div class="loading-placeholder">Carregando suas últimas tarefas...</div>';
+                
+                const url = forceRefresh ? '/workorders/user/tasks?force_refresh=true' : '/workorders/user/tasks';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.data.user_tasks) {
+                    displayUserTasks(data.data.user_tasks);
+                } else {
+                    container.innerHTML = '<div class="loading-placeholder">❌ Erro ao carregar tarefas</div>';
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar tarefas:', error);
+                document.getElementById('user-tasks-container').innerHTML = '<div class="loading-placeholder">❌ Erro de conexão</div>';
+            } finally {
+                document.getElementById('load-tasks-btn').disabled = false;
+                document.getElementById('load-tasks-btn').innerHTML = '🔄 Atualizar Tarefas';
+            }
+        }
+
+        // Função para exibir tarefas do usuário
+        function displayUserTasks(tasks) {
+            const container = document.getElementById('user-tasks-container');
+            
+            if (!tasks || tasks.length === 0) {
+                container.innerHTML = '<div class="loading-placeholder">📝 Nenhuma tarefa encontrada</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            tasks.forEach(task => {
+                const stateClass = `state-${task.state_label.toLowerCase().replace(' ', '')}`;
+                const priorityClass = `priority-${task.priority_label.toLowerCase()}`;
+                const timeSpent = task.time_spent > 0 ? `${task.time_spent}h` : 'N/A';
+                const openedDate = new Date(task.opened_at).toLocaleDateString('pt-BR');
+                
+                html += `
+                    <div class="user-task-item">
+                        <div class="task-info">
+                            <div class="task-number">#${task.task_number}</div>
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-meta">
+                                <span class="task-badge ${stateClass}">${task.state_label}</span>
+                                <span class="task-badge ${priorityClass}">${task.priority_label}</span>
+                            </div>
+                        </div>
+                        <div class="task-time">
+                            <div><strong>${timeSpent}</strong></div>
+                            <div>${openedDate}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Função para alternar entre lista e resumo
+        async function toggleTasksView() {
+            const container = document.getElementById('user-tasks-container');
+            const toggleButton = document.getElementById('toggle-view-btn');
+            
+            showingTasksSummary = !showingTasksSummary;
+            
+            if (showingTasksSummary) {
+                // Mostrar resumo
+                try {
+                    const response = await fetch('/workorders/user/summary');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        displayTasksSummary(data.summary);
+                        toggleButton.innerHTML = '📋 Ver Lista';
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar resumo:', error);
+                }
+            } else {
+                // Mostrar lista
+                loadUserTasks();
+                toggleButton.innerHTML = '📊 Ver Resumo';
+            }
+        }
+
+        // Função para exibir resumo das tarefas
+        function displayTasksSummary(summary) {
+            const container = document.getElementById('user-tasks-container');
+            const stats = summary.summary;
+            
+            let html = `
+                <div class="tasks-summary">
+                    <h3>📊 Resumo das Suas Tarefas</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-value">${stats.total_tasks}</span>
+                            <span class="summary-label">Total</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">${stats.resolved_tasks}</span>
+                            <span class="summary-label">Resolvidas</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">${stats.resolution_rate}%</span>
+                            <span class="summary-label">Taxa Resolução</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">${stats.total_time_spent}h</span>
+                            <span class="summary-label">Tempo Total</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">${stats.avg_time_per_task}h</span>
+                            <span class="summary-label">Média/Tarefa</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Adicionar distribuição por prioridade
+            if (stats.priority_distribution) {
+                html += '<div style="margin-top: 15px;"><h4>📊 Por Prioridade:</h4>';
+                for (const [priority, count] of Object.entries(stats.priority_distribution)) {
+                    html += `<span class="task-badge priority-${priority.toLowerCase()}" style="margin: 3px;">${priority}: ${count}</span> `;
+                }
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Carregar última execução quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLastExecution();
+            loadUserTasks(); // Carregar tarefas do usuário também
+        });
     </script>
 </body>
 </html>

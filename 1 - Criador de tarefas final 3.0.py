@@ -579,7 +579,7 @@ def main():
         close_any_open_select2(driver, 3)
 
         # TEMPO ESTIMADO
-        est = espera_visivel(driver, "//*[@id='for_udf_fields.sline_tempo_estimado']", 25)
+        est = espera_visivel(driver, "//*[@id='for_udf_fields_sline_tempo_estimado']", 25)
         driver.execute_script("arguments[0].scrollIntoView({block:'center'});", est)
         est.clear()
         est_val = tarefa.get("tempo_estimado")
@@ -588,7 +588,7 @@ def main():
         est.send_keys(limpa_dec(est_val))
 
         # TEMPO GASTO
-        gst = espera_visivel(driver, "//*[@id='for_udf_fields.sline_tempo_gasto']", 25)
+        gst = espera_visivel(driver, "//*[@id='for_udf_fields_sline_tempo_gasto']", 25)
         driver.execute_script("arguments[0].scrollIntoView({block:'center'});", gst)
         gst.clear()
         gst.send_keys(hours_to_form_input(tarefa["_tempo_gasto_h"]))

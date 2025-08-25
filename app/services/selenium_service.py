@@ -90,7 +90,8 @@ class SeleniumService:
                 "workorder_id": workorder_id,
                 "hours_target": hours_target,
                 "exec_tag": exec_tag,
-                "status": "started"
+                "status": "started",
+                "started_at": started_at.isoformat()
             }
             
         except Exception as e:
@@ -167,10 +168,12 @@ class SeleniumService:
             
             if created_tasks:
                 execution["status"] = "success"
-                execution["created_task_ids"] = created_tasks
+                execution["created_task_ids"] = created_tasks  # Agora é lista de dicts
                 
+                # Log resumido para facilitar leitura
+                task_summary = ", ".join([f"#{task['task_id']} ({task['time_spent']}h)" for task in created_tasks])
                 logger.info(f"Automação concluída com sucesso - execution_id: {execution_id}, "
-                           f"tarefas criadas: {created_tasks}")
+                           f"{len(created_tasks)} tarefas criadas: {task_summary}")
                 
                 # Invalidar cache apenas em caso de sucesso
                 self._invalidate_cache()
@@ -198,13 +201,12 @@ class SeleniumService:
         try:
             logger.info("Iniciando execução do script Selenium...")
             
-            # Preparar ambiente
-            env = os.environ.copy()
-            env["NO_PROMPT"] = "1"  # Modo sem prompt
-            env["EXEC_TAG"] = exec_tag  # Tag de execução
+            # Comando para executar o script com exec_tag
+            cmd = ["python", str(SCRIPT_PATH), "--exec-tag", exec_tag]
             
-            # Comando para executar o script
-            cmd = ["python", str(SCRIPT_PATH)]
+            # Configurar ambiente sem prompt interativo
+            env = os.environ.copy()
+            env["NO_PROMPT"] = "1"
             
             # Executar com timeout
             with open(self.log_file, "a", encoding="utf-8") as log_f:
@@ -236,7 +238,7 @@ class SeleniumService:
             logger.error(f"Erro ao executar script Selenium: {str(e)}", exc_info=True)
             return False
     
-    def _verify_created_tasks(self, workorder_id: int, exec_tag: str, started_at: datetime) -> List[int]:
+    def _verify_created_tasks(self, workorder_id: int, exec_tag: str, started_at: datetime) -> List[Dict[str, Any]]:
         """
         Verifica no SQL se tarefas foram criadas com o EXEC_TAG
         
@@ -246,42 +248,115 @@ class SeleniumService:
             started_at: Momento que a execução iniciou
             
         Returns:
-            Lista de IDs das tarefas criadas
+            Lista de dicionários com informações completas das tarefas criadas:
+            [{"task_id": int, "title": str, "time_spent": float}, ...]
         """
         try:
             # Janela de busca: 2 minutos antes do início até agora
             search_start = started_at - timedelta(seconds=120)
             search_end = datetime.now()
             
-            # Query para buscar tarefas criadas
+            # Query corrigida baseada na estrutura real do ServiceDesk
             query = """
-            SELECT TASKID, TITLE, DESCRIPTION, CREATEDTIME
-            FROM dbo.WorkOrder_Tasks
-            WHERE WORKORDERID = ?
-              AND CREATEDTIME >= ?
-              AND CREATEDTIME <= ?
-              AND (TITLE LIKE ? OR DESCRIPTION LIKE ?)
-            ORDER BY CREATEDTIME DESC
+            SELECT DISTINCT
+                td.TASKID,
+                td.TITLE AS TaskTitle,
+                TRY_CONVERT(decimal(10,2), REPLACE(tf.UDF_CHAR2, ',', '.')) AS TempoGasto,
+                TRY_CONVERT(decimal(10,2), REPLACE(tf.UDF_CHAR1, ',', '.')) AS TempoEstimado,
+                td.CREATEDDATE,
+                tdesc.DESCRIPTION
+            FROM dbo.TaskDetails td
+            JOIN dbo.WorkOrderToTaskDetails wttd ON wttd.TASKID = td.TASKID
+            LEFT JOIN dbo.Task_Fields tf ON tf.TASKID = td.TASKID
+            LEFT JOIN dbo.TaskDescription tdesc ON tdesc.TASKID = td.TASKID
+            WHERE wttd.WORKORDERID = ?
+              AND td.CREATEDDATE >= ?
+              AND td.CREATEDDATE <= ?
+              AND tdesc.DESCRIPTION LIKE ?
             """
             
-            # Parâmetros da query
-            search_pattern = f"%{exec_tag}%"
-            params = (
+            # Parâmetros da query - timestamps em milissegundos (formato ServiceDesk)
+            exec_tag_discreto = exec_tag[-4:] + " -->"
+            exec_tag_html_encoded = exec_tag[-4:] + " --&gt;"  # Versão HTML encoded
+            
+            # Buscar ambos os padrões: normal e HTML encoded
+            search_pattern_normal = f"%{exec_tag_discreto}%"
+            search_pattern_encoded = f"%{exec_tag_html_encoded}%"
+            
+            timestamp_inicio = int(search_start.timestamp() * 1000)
+            timestamp_fim = int(search_end.timestamp() * 1000)
+            
+            # Tentar primeiro com padrão HTML encoded (mais comum no ServiceDesk)
+            params_encoded = (
                 workorder_id,
-                search_start.strftime('%Y-%m-%d %H:%M:%S'),
-                search_end.strftime('%Y-%m-%d %H:%M:%S'),
-                search_pattern,
-                search_pattern
+                timestamp_inicio,
+                timestamp_fim,
+                search_pattern_encoded
             )
             
-            results = db.execute_query(query, params)
+            results = db.execute_query(query, params_encoded)
+            
+            # Se não encontrar, tentar com padrão normal
+            if not results:
+                params_normal = (
+                    workorder_id,
+                    timestamp_inicio,
+                    timestamp_fim,
+                    search_pattern_normal
+                )
+                results = db.execute_query(query, params_normal)
+                used_pattern = exec_tag_discreto
+            else:
+                used_pattern = exec_tag_html_encoded
+            
+            logger.info(f"Busca por tasks com EXEC_TAG {used_pattern}: "
+                       f"workorder_id={workorder_id}, período={search_start} até {search_end}")
             
             if results:
-                task_ids = [row["TASKID"] for row in results]
-                logger.info(f"Tarefas encontradas com EXEC_TAG {exec_tag}: {task_ids}")
-                return task_ids
+                # Construir lista de tarefas com informações completas
+                created_tasks = []
+                for row in results:
+                    task_info = {
+                        "task_id": row["TASKID"],
+                        "title": row["TaskTitle"] or "Sem título",
+                        "time_spent": float(row["TempoGasto"] or 0.0),
+                        "time_estimated": float(row["TempoEstimado"] or 0.0)
+                    }
+                    created_tasks.append(task_info)
+                    
+                    # Log detalhado
+                    created_dt = datetime.fromtimestamp(row["CREATEDDATE"] / 1000)
+                    logger.info(f"Task {task_info['task_id']}: '{task_info['title']}' "
+                               f"({task_info['time_spent']}h gasto/{task_info['time_estimated']}h estimado) - criada: {created_dt}")
+                
+                logger.info(f"Total de {len(created_tasks)} tarefas encontradas com EXEC_TAG {exec_tag}")
+                return created_tasks
+                
             else:
                 logger.warning(f"Nenhuma tarefa encontrada com EXEC_TAG {exec_tag} no período")
+                logger.warning(f"Testados padrões: '{exec_tag_discreto}' e '{exec_tag_html_encoded}'")
+                
+                # Debug: verificar se existem tasks criadas no período (sem o padrão)
+                debug_query = """
+                SELECT COUNT(*), MIN(td.CREATEDDATE), MAX(td.CREATEDDATE)
+                FROM dbo.TaskDetails td
+                JOIN dbo.WorkOrderToTaskDetails wttd ON wttd.TASKID = td.TASKID
+                WHERE wttd.WORKORDERID = ?
+                  AND td.CREATEDDATE >= ?
+                  AND td.CREATEDDATE <= ?
+                """
+                
+                debug_results = db.execute_query(debug_query, (workorder_id, timestamp_inicio, timestamp_fim))
+                if debug_results and debug_results[0][0] > 0:
+                    count = debug_results[0][0]
+                    min_date = datetime.fromtimestamp(debug_results[0][1] / 1000)
+                    max_date = datetime.fromtimestamp(debug_results[0][2] / 1000)
+                    logger.warning(f"AVISO: Existem {count} tasks no período ({min_date} até {max_date}) "
+                                 f"mas nenhuma com os padrões testados. "
+                                 f"Verificar se o Selenium está inserindo o padrão corretamente.")
+                else:
+                    logger.warning(f"Nenhuma task encontrada no WorkOrder {workorder_id} no período especificado")
+                
                 return []
                 
         except Exception as e:
@@ -289,11 +364,16 @@ class SeleniumService:
             return []
     
     def _invalidate_cache(self):
-        """Invalida cache após criação bem-sucedida de tarefas"""
+        """Invalida apenas caches relacionados a tarefas após criação bem-sucedida"""
         try:
-            from app.services.cache_service import CacheService
-            CacheService.clear_all_cache()
-            logger.info("Cache invalidado após criação de tarefas")
+            # Invalidar apenas caches de tarefas, não o calendário
+            from app.services.user_tasks_cache_service import user_tasks_cache_service
+            from app.services.execution_cache_service import execution_cache_service
+            
+            user_tasks_cache_service.invalidate_tasks_cache()
+            execution_cache_service.clear_execution_cache()
+            
+            logger.info("Cache de tarefas invalidado após criação de tarefas")
         except Exception as e:
             logger.warning(f"Erro ao invalidar cache: {str(e)}")
     

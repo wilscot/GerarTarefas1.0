@@ -9,20 +9,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from pathlib import Path
-from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
 # Configuração de caminhos
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = os.path.join(BASE_DIR, "data", "cache")
-
-class DecimalEncoder(json.JSONEncoder):
-    """Encoder JSON customizado para objetos Decimal"""
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return super(DecimalEncoder, self).default(obj)
 
 class CacheManager:
     """Gerenciador de cache com TTL"""
@@ -94,7 +86,7 @@ class CacheManager:
             }
             
             with open(cache_file, 'w', encoding='utf-8') as f:
-                json.dump(cache_entry, f, indent=2, ensure_ascii=False, cls=DecimalEncoder)
+                json.dump(cache_entry, f, indent=2, ensure_ascii=False)
             
             logger.debug(f"Cache atualizado para chave: {key}")
             return True
@@ -219,7 +211,7 @@ class PersistentCache(CacheManager):
             
             # Salva de volta
             with open(self.persistent_file, 'w', encoding='utf-8') as f:
-                json.dump(persistent_data, f, indent=2, ensure_ascii=False, cls=DecimalEncoder)
+                json.dump(persistent_data, f, indent=2, ensure_ascii=False)
             
             logger.debug(f"Cache persistente atualizado: {key}")
             return True

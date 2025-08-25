@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime, date
 import logging
 from app.services.calendar_service import CalendarService
+from app.services.calendar_cache_service import calendar_cache_service
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ def get_calendar_data():
     
     Query params opcionais:
     - reference_date: Data de referência no formato YYYY-MM-DD
+    - force_refresh: Força atualização dos dados (true/false)
     """
     try:
         # Parse da data de referência se fornecida
@@ -31,13 +33,33 @@ def get_calendar_data():
                     'error': 'Formato de data inválido. Use YYYY-MM-DD.'
                 }), 400
         
-        calendar_service = CalendarService()
-        data = calendar_service.get_calendar_data(reference_date)
+        # Verifica se deve forçar refresh
+        force_refresh = request.args.get('force_refresh', '').lower() == 'true'
         
-        return jsonify({
-            'success': True,
-            'data': data
-        })
+        # Usa cache-first approach
+        try:
+            data = calendar_cache_service.get_calendar_data(force_refresh=force_refresh)
+            
+            return jsonify({
+                'success': True,
+                'data': data,
+                'cached': True,
+                'cache_status': calendar_cache_service.get_cache_status()
+            })
+            
+        except Exception as cache_error:
+            logger.warning(f"Erro no cache, fallback para serviço: {cache_error}")
+            
+            # Fallback para serviço original
+            calendar_service = CalendarService()
+            data = calendar_service.get_calendar_data(reference_date)
+            
+            return jsonify({
+                'success': True,
+                'data': data,
+                'cached': False,
+                'fallback': True
+            })
         
     except Exception as e:
         logger.error(f"Erro ao buscar dados do calendário: {e}")
@@ -74,6 +96,38 @@ def get_day_details(date_str):
         return jsonify({
             'success': False,
             'error': 'Erro interno do servidor'
+        }), 500
+
+@calendar_bp.route('/cache/status', methods=['GET'])
+def get_cache_status():
+    """Retorna status do cache do calendário"""
+    try:
+        status = calendar_cache_service.get_cache_status()
+        return jsonify({
+            'success': True,
+            'cache_status': status
+        })
+    except Exception as e:
+        logger.error(f"Erro ao obter status do cache: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@calendar_bp.route('/cache/invalidate', methods=['POST'])
+def invalidate_cache():
+    """Invalida cache do calendário"""
+    try:
+        calendar_cache_service.invalidate_calendar_cache()
+        return jsonify({
+            'success': True,
+            'message': 'Cache invalidado com sucesso'
+        })
+    except Exception as e:
+        logger.error(f"Erro ao invalidar cache: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
         }), 500
 
 @calendar_bp.route('/summary', methods=['GET'])

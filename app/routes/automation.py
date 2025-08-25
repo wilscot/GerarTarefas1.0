@@ -6,7 +6,8 @@ Endpoints para execução da automação Selenium com verificação real de TASK
 from flask import Blueprint, jsonify, request
 from app.services.workorder_service import WorkOrderService
 from app.services.cache_service import CacheService
-from app.services.selenium_service_new import selenium_service
+from app.services.selenium_service import selenium_service
+from app.services.execution_cache_service import execution_cache_service
 
 automation_bp = Blueprint('automation', __name__)
 
@@ -74,10 +75,22 @@ def run_automation():
                 "title": workorder.title
             }), 400
         
+        # Registrar início da execução
+        execution_cache_service.record_automation_execution("started", {
+            "workorder_id": workorder.workorder_id,
+            "hours_target": hours_target,
+            "title": workorder.title
+        })
+        
         # Iniciar automação com verificação SQL
         result = selenium_service.start_automation(workorder.workorder_id, hours_target)
         
         if result.get("error"):
+            # Registrar falha
+            execution_cache_service.record_automation_execution("failed", {
+                "workorder_id": workorder.workorder_id,
+                "error": result.get("error")
+            })
             return jsonify(result), 500
         
         # Retornar 202 Accepted com execution_id para polling
@@ -260,6 +273,14 @@ def run_automation_sync():
                     task_count = len(result.get("created_task_ids", []))
                     total_hours = sum(task.get("time_spent", 0) for task in result.get("created_task_ids", []))
                     
+                    # Registrar conclusão com sucesso
+                    execution_cache_service.record_automation_execution("completed", {
+                        "workorder_id": workorder.workorder_id,
+                        "tasks_created": task_count,
+                        "total_hours_logged": round(total_hours, 2),
+                        "execution_time": round(time.time() - start_time, 2)
+                    })
+                    
                     return jsonify({
                         "success": True,
                         "execution_id": execution_id,
@@ -274,6 +295,13 @@ def run_automation_sync():
                     
                 else:
                     # Erro ou nenhuma tarefa detectada
+                    execution_cache_service.record_automation_execution("failed", {
+                        "workorder_id": workorder.workorder_id,
+                        "status": result.get("status"),
+                        "error": result.get("error", "Automação falhou"),
+                        "execution_time": round(time.time() - start_time, 2)
+                    })
+                    
                     return jsonify({
                         "success": False,
                         "execution_id": execution_id,
@@ -336,3 +364,24 @@ def automation_status():
             "processes": [],
             "process_count": 0
         }), 500
+
+@automation_bp.route('/execution/last', methods=['GET'])
+def get_last_execution():
+    """Retorna informações da última execução da automação"""
+    try:
+        last_execution = execution_cache_service.get_last_automation()
+        return jsonify({
+            "success": True,
+            "last_execution": last_execution
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@automation_bp.route('/system/info', methods=['GET'])
+def get_system_info():
+    """Retorna informações gerais do sistema"""
+    try:
+        system_info = execution_cache_service.get_system_info()
+        return jsonify({"success": True, "system_info": system_info})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

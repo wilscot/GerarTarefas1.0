@@ -29,7 +29,6 @@ class WorkOrderService:
             workorder_title = current_app.config['WORKORDER_TITLE']
             
             query = """
-            DECLARE @OwnerId bigint = ?;
             ;WITH CurrentState AS (
               SELECT
                 ws.WORKORDERID,
@@ -45,13 +44,14 @@ class WorkOrderService:
             FROM dbo.WorkOrder AS w
             JOIN CurrentState AS cs ON cs.WORKORDERID = w.WORKORDERID AND cs.rn = 1
             WHERE w.TITLE = ?
-              AND cs.OWNERID = @OwnerId
+              AND cs.OWNERID = ?
             ORDER BY w.CREATEDTIME DESC;
             """
             
-            results = db.execute_query(query, (owner_id, workorder_title))
+            results = db.execute_query(query, (workorder_title, owner_id))
             
             if results and len(results) > 0:
+                # results é uma lista de dicionários, usar from_sql_result para conversão correta
                 workorder = WorkOrder.from_sql_result(results[0])
                 logger.info(f"WorkOrder encontrado: {workorder.workorder_id}")
                 return workorder
@@ -88,6 +88,7 @@ class WorkOrderService:
             results = db.execute_query(query, (workorder_id,))
             
             if results and len(results) > 0:
+                # results é uma lista de dicionários, usar from_sql_result para conversão correta
                 workorder = WorkOrder.from_sql_result(results[0])
                 logger.info(f"WorkOrder {workorder_id} encontrado")
                 return workorder

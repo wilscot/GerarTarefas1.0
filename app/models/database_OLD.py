@@ -6,7 +6,6 @@ Gerencia conexão com SQL Server ServiceDesk com fallback robusto
 import os
 import pyodbc
 import logging
-import threading
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 from dotenv import load_dotenv
@@ -17,7 +16,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 class DatabaseConnection:
-    """Gerenciador de conexão com SQL Server com fallback robusto e thread-safe"""
+    """Gerenciador de conexão com SQL Server com fallback robusto"""
     
     def __init__(self):
         self._connection = None
@@ -25,7 +24,6 @@ class DatabaseConnection:
         self.last_variant = None
         self.last_error = None
         self.latency_ms = None
-        self._lock = threading.Lock()  # Lock para thread safety
     
     def connect(self) -> bool:
         """
@@ -101,7 +99,7 @@ class DatabaseConnection:
     
     def execute_query(self, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
         """
-        Executa query SELECT e retorna resultados (Thread-safe)
+        Executa query SELECT e retorna resultados
         
         Args:
             query: SQL query
@@ -110,40 +108,29 @@ class DatabaseConnection:
         Returns:
             Lista de dicionários com os resultados ou None se erro
         """
-        with self._lock:  # Thread safety
-            cursor = None
-            try:
-                # Sempre reconectar para evitar conexão ocupada
-                if not self.connect():
-                    logger.error("Todas as tentativas de conexão SQL falharam")
-                    return None
-            
-                cursor = self._connection.cursor()
-                cursor.execute(query, params)
-                
-                # Obter nomes das colunas
-                columns = [column[0] for column in cursor.description]
-                
-                # Converter resultados para lista de dicionários
-                results = []
-                for row in cursor.fetchall():
-                    results.append(dict(zip(columns, row)))
-                
-                logger.debug(f"Query executada com sucesso. {len(results)} registros retornados")
-                return results
-                
-            except Exception as e:
-                logger.error(f"Erro ao executar query: {str(e)}")
-                # Forçar reconexão na próxima chamada
-                self.disconnect()
+        if not self._connection:
+            if not self.connect():
                 return None
-            finally:
-                # Sempre fechar cursor
-                if cursor:
-                    try:
-                        cursor.close()
-                    except:
-                        pass
+        
+        try:
+            cursor = self._connection.cursor()
+            cursor.execute(query, params)
+            
+            # Obter nomes das colunas
+            columns = [column[0] for column in cursor.description]
+            
+            # Converter resultados para lista de dicionários
+            results = []
+            for row in cursor.fetchall():
+                results.append(dict(zip(columns, row)))
+            
+            cursor.close()
+            logger.debug(f"Query executada com sucesso. {len(results)} registros retornados")
+            return results
+            
+        except Exception as e:
+            logger.error(f"Erro ao executar query: {str(e)}")
+            return None
     
     def test_connection(self) -> Dict[str, Any]:
         """

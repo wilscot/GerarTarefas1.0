@@ -1,0 +1,887 @@
+{
+  "calendar_data": {
+    "data": {
+      "period_start": "2025-07-26",
+      "period_end": "2025-08-25",
+      "reference_date": "2025-08-25",
+      "daily_data": {
+        "2025-07-26": {
+          "date": "2025-07-26",
+          "day_of_week": 5,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-07-27": {
+          "date": "2025-07-27",
+          "day_of_week": 6,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-07-28": {
+          "date": "2025-07-28",
+          "day_of_week": 0,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-07-29": {
+          "date": "2025-07-29",
+          "day_of_week": 1,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-07-30": {
+          "date": "2025-07-30",
+          "day_of_week": 2,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-07-31": {
+          "date": "2025-07-31",
+          "day_of_week": 3,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 8.0,
+          "exclusion_type": "total",
+          "calendar_color": "excluded-total",
+          "tasks": [],
+          "exclusions": [
+            {
+              "date": "2025-07-31",
+              "hours": 8.0,
+              "reason": "banco-horas",
+              "type": "partial"
+            }
+          ]
+        },
+        "2025-08-01": {
+          "date": "2025-08-01",
+          "day_of_week": 4,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-02": {
+          "date": "2025-08-02",
+          "day_of_week": 5,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-03": {
+          "date": "2025-08-03",
+          "day_of_week": 6,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-04": {
+          "date": "2025-08-04",
+          "day_of_week": 0,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-05": {
+          "date": "2025-08-05",
+          "day_of_week": 1,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-06": {
+          "date": "2025-08-06",
+          "day_of_week": 2,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 8.0,
+          "exclusion_type": "total",
+          "calendar_color": "excluded-total",
+          "tasks": [],
+          "exclusions": [
+            {
+              "date": "2025-08-06",
+              "hours": 8.0,
+              "reason": "banco-horas",
+              "type": "partial"
+            }
+          ]
+        },
+        "2025-08-07": {
+          "date": "2025-08-07",
+          "day_of_week": 3,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-08": {
+          "date": "2025-08-08",
+          "day_of_week": 4,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-09": {
+          "date": "2025-08-09",
+          "day_of_week": 5,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-10": {
+          "date": "2025-08-10",
+          "day_of_week": 6,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-11": {
+          "date": "2025-08-11",
+          "day_of_week": 0,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-12": {
+          "date": "2025-08-12",
+          "day_of_week": 1,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-13": {
+          "date": "2025-08-13",
+          "day_of_week": 2,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-14": {
+          "date": "2025-08-14",
+          "day_of_week": 3,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-15": {
+          "date": "2025-08-15",
+          "day_of_week": 4,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-16": {
+          "date": "2025-08-16",
+          "day_of_week": 5,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-17": {
+          "date": "2025-08-17",
+          "day_of_week": 6,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-18": {
+          "date": "2025-08-18",
+          "day_of_week": 0,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-19": {
+          "date": "2025-08-19",
+          "day_of_week": 1,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-20": {
+          "date": "2025-08-20",
+          "day_of_week": 2,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-21": {
+          "date": "2025-08-21",
+          "day_of_week": 3,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-22": {
+          "date": "2025-08-22",
+          "day_of_week": 4,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-23": {
+          "date": "2025-08-23",
+          "day_of_week": 5,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-24": {
+          "date": "2025-08-24",
+          "day_of_week": 6,
+          "is_weekend": true,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "weekend",
+          "tasks": [],
+          "exclusions": []
+        },
+        "2025-08-25": {
+          "date": "2025-08-25",
+          "day_of_week": 0,
+          "is_weekend": false,
+          "tasks_count": 0,
+          "hours_worked": 0,
+          "hours_excluded": 0,
+          "exclusion_type": null,
+          "calendar_color": "none",
+          "tasks": [],
+          "exclusions": []
+        }
+      },
+      "weeks_data": [
+        [
+          {
+            "date": "2025-07-20",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-21",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-22",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-23",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-24",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-25",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-07-26",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          }
+        ],
+        [
+          {
+            "date": "2025-07-27",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-07-28",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-07-29",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-07-30",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-07-31",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 8.0,
+            "exclusion_type": "total",
+            "calendar_color": "excluded-total",
+            "tasks": [],
+            "exclusions": [
+              {
+                "date": "2025-07-31",
+                "hours": 8.0,
+                "reason": "banco-horas",
+                "type": "partial"
+              }
+            ]
+          },
+          {
+            "date": "2025-08-01",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-02",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          }
+        ],
+        [
+          {
+            "date": "2025-08-03",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-04",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-05",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-06",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 8.0,
+            "exclusion_type": "total",
+            "calendar_color": "excluded-total",
+            "tasks": [],
+            "exclusions": [
+              {
+                "date": "2025-08-06",
+                "hours": 8.0,
+                "reason": "banco-horas",
+                "type": "partial"
+              }
+            ]
+          },
+          {
+            "date": "2025-08-07",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-08",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-09",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          }
+        ],
+        [
+          {
+            "date": "2025-08-10",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-11",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-12",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-13",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-14",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-15",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-16",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          }
+        ],
+        [
+          {
+            "date": "2025-08-17",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-18",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-19",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-20",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-21",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-22",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-23",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          }
+        ],
+        [
+          {
+            "date": "2025-08-24",
+            "day_of_week": 6,
+            "is_weekend": true,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "weekend",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-25",
+            "day_of_week": 0,
+            "is_weekend": false,
+            "tasks_count": 0,
+            "hours_worked": 0,
+            "hours_excluded": 0,
+            "exclusion_type": null,
+            "calendar_color": "none",
+            "tasks": [],
+            "exclusions": []
+          },
+          {
+            "date": "2025-08-26",
+            "day_of_week": 1,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-08-27",
+            "day_of_week": 2,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-08-28",
+            "day_of_week": 3,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-08-29",
+            "day_of_week": 4,
+            "is_weekend": false,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          },
+          {
+            "date": "2025-08-30",
+            "day_of_week": 5,
+            "is_weekend": true,
+            "out_of_period": true,
+            "calendar_color": "out-of-period"
+          }
+        ]
+      ],
+      "summary": {
+        "total_days": 31,
+        "business_days": 21,
+        "total_hours_worked": 0,
+        "total_hours_excluded": 16.0,
+        "total_tasks": 0,
+        "days_with_tasks": 0,
+        "days_with_exclusions": 2,
+        "average_hours_per_business_day": 0.0
+      },
+      "last_updated": "2025-08-25T15:00:22.396116",
+      "cached": true
+    },
+    "last_updated": "2025-08-25T15:00:22.399378"
+  }
+}
