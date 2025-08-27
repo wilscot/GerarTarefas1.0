@@ -3,11 +3,13 @@ Automation routes
 Endpoints para execução da automação Selenium com verificação real de TASKIDs
 """
 
+from datetime import datetime
 from flask import Blueprint, jsonify, request, render_template
 from app.services.workorder_service import WorkOrderService
 from app.services.cache_service import CacheService
 from app.services.selenium_service import selenium_service
 from app.services.execution_cache_service import execution_cache_service
+from app.services.task_deduplication_service import task_deduplication_service
 
 automation_bp = Blueprint('automation', __name__)
 
@@ -392,3 +394,37 @@ def get_system_info():
         return jsonify({"success": True, "system_info": system_info})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@automation_bp.route('/analyze/duplicates', methods=['GET'])
+def analyze_task_duplicates():
+    """
+    Analisa potencial duplicação de tarefas
+    
+    Query params:
+        hours_target: Horas para simular análise (default: 8.0)
+    
+    Returns:
+        JSON com análise detalhada de duplicação
+    """
+    try:
+        hours_target = float(request.args.get('hours_target', 8.0))
+        
+        # Obter análise completa do serviço de duplicação
+        analysis_report = task_deduplication_service.get_analysis_report()
+        
+        # Simular validação de seleção de tarefas
+        selenium_analysis = selenium_service._validate_task_selection(hours_target)
+        
+        return jsonify({
+            "success": True,
+            "hours_target": hours_target,
+            "deduplication_report": analysis_report,
+            "selection_analysis": selenium_analysis,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False, 
+            "error": str(e)
+        }), 500

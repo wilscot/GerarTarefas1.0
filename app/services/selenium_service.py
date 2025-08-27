@@ -1,6 +1,7 @@
 """
 Selenium Service
 Integração com o script de automação existente com verificação real de TASKIDs
+e desduplicação de tarefas
 """
 
 import os
@@ -8,10 +9,12 @@ import subprocess
 import threading
 import logging
 import uuid
+import csv
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 from app.models.database import db
+from app.services.task_deduplication_service import task_deduplication_service
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,7 @@ SCRIPT_PATH = os.path.join(BASE_DIR, "1 - Criador de tarefas final 3.0.py")
 AUTOMATION_LOG_PATH = os.path.join(LOGS_DIR, "automation.log")
 LAST_REQUEST_FILE = os.path.join(BASE_DIR, "last_request.txt")
 LAST_HOURS_FILE = os.path.join(BASE_DIR, "last_hours.txt")
+BANCO_TAREFAS_CSV = os.path.join(BASE_DIR, "Banco_Tarefas.csv")
 
 class SeleniumService:
     """Serviço para execução do Selenium com verificação real de TASKIDs"""
@@ -41,18 +45,158 @@ class SeleniumService:
         now = datetime.now()
         return f"AUTO_{now.strftime('%Y%m%d_%H%M%S')}"
     
+    def _load_available_tasks(self) -> List[Dict[str, Any]]:
+        """
+        Carrega tarefas disponíveis do banco_tarefas.csv
+        
+        Returns:
+            Lista de tarefas disponíveis
+        """
+        tasks = []
+        try:
+            csv_path = Path(BANCO_TAREFAS_CSV)
+            if not csv_path.exists():
+                logger.error(f"Arquivo banco_tarefas.csv não encontrado: {csv_path}")
+                return []
+            
+            with open(csv_path, 'r', encoding='utf-8-sig') as file:  # utf-8-sig remove BOM
+                reader = csv.DictReader(file, delimiter=';')
+                for row in reader:
+                    try:
+                        # Estrutura: titulo;descricao;tempo_estimado;tempo_gasto;complexidade
+                        tempo_estimado_str = str(row.get('tempo_estimado', '0')).replace(',', '.').strip()
+                        tempo_estimado = float(tempo_estimado_str) if tempo_estimado_str else 0.0
+                        
+                        task = {
+                            'title': row.get('titulo', '').strip(),
+                            'description': row.get('descricao', '').strip(),
+                            'hours': tempo_estimado,
+                            'complexity': row.get('complexidade', 'normal').strip()
+                        }
+                        
+                        if task['title'] and task['hours'] > 0:
+                            tasks.append(task)
+                            
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Erro ao processar linha do CSV: {row} - Erro: {e}")
+                        continue
+            
+            logger.info(f"Carregadas {len(tasks)} tarefas do banco_tarefas.csv")
+            return tasks
+            
+        except Exception as e:
+            logger.error(f"Erro ao carregar banco_tarefas.csv: {str(e)}")
+            return []
+    
+    def _validate_task_selection(self, hours_target: float) -> Dict[str, Any]:
+        """
+        Valida se há tarefas suficientes após filtro de duplicação
+        
+        Args:
+            hours_target: Horas necessárias
+            
+        Returns:
+            Dict com resultado da validação
+        """
+        try:
+            # Carregar tarefas disponíveis
+            available_tasks = self._load_available_tasks()
+            
+            if not available_tasks:
+                return {
+                    'can_proceed': False,
+                    'abort_reason': 'Nenhuma tarefa encontrada no banco_tarefas.csv',
+                    'analysis': {
+                        'csv_file': BANCO_TAREFAS_CSV,
+                        'csv_exists': Path(BANCO_TAREFAS_CSV).exists(),
+                        'tasks_loaded': 0
+                    }
+                }
+            
+            # Aplicar filtro de duplicação
+            filter_result = task_deduplication_service.filter_available_tasks(available_tasks)
+            filtered_tasks = filter_result['filtered_tasks']
+            filter_analysis = filter_result['analysis']
+            
+            # Validar se há tarefas suficientes
+            validation = task_deduplication_service.validate_task_selection(hours_target, filtered_tasks)
+            
+            # Compilar análise completa
+            complete_analysis = {
+                'csv_analysis': {
+                    'file_path': BANCO_TAREFAS_CSV,
+                    'file_exists': Path(BANCO_TAREFAS_CSV).exists(),
+                    'total_tasks_loaded': len(available_tasks),
+                    'total_hours_available': sum(t.get('hours', 0) for t in available_tasks)
+                },
+                'deduplication_analysis': filter_analysis,
+                'validation_analysis': validation,
+                'final_decision': {
+                    'can_proceed': validation['can_proceed'],
+                    'abort_reason': validation.get('abort_reason', None)
+                }
+            }
+            
+            logger.info(f"Validação de tarefas: {validation['can_proceed']} - "
+                       f"{len(filtered_tasks)} tarefas disponíveis para {hours_target}h")
+            
+            return complete_analysis
+            
+        except Exception as e:
+            logger.error(f"Erro na validação de tarefas: {str(e)}")
+            return {
+                'csv_analysis': {
+                    'file_path': BANCO_TAREFAS_CSV,
+                    'file_exists': False,
+                    'total_tasks_loaded': 0,
+                    'total_hours_available': 0
+                },
+                'deduplication_analysis': {
+                    'can_proceed': False,
+                    'error': str(e)
+                },
+                'validation_analysis': {
+                    'can_proceed': False,
+                    'abort_reason': f'Erro interno na validação: {str(e)}'
+                },
+                'final_decision': {
+                    'can_proceed': False,
+                    'abort_reason': f'Erro interno na validação: {str(e)}'
+                }
+            }
+    
     def start_automation(self, workorder_id: int, hours_target: float = 8.0) -> Dict[str, Any]:
         """
-        Inicia automação Selenium em background com verificação SQL
+        Inicia automação Selenium em background com verificação SQL e validação de duplicação
         
         Args:
             workorder_id: ID do chamado
             hours_target: Horas alvo para geração
             
         Returns:
-            Dict com execution_id e status inicial
+            Dict com execution_id e status inicial ou análise de abort
         """
         try:
+            # Validar disponibilidade de tarefas (com filtro de duplicação)
+            validation_result = self._validate_task_selection(hours_target)
+            
+            # Verificar se pode prosseguir
+            can_proceed = validation_result.get('final_decision', {}).get('can_proceed', False)
+            
+            if not can_proceed:
+                abort_reason = validation_result.get('final_decision', {}).get('abort_reason', 'Validação falhou')
+                analysis = validation_result
+                
+                logger.warning(f"Automação abortada: {abort_reason}")
+                
+                return {
+                    "status": "aborted",
+                    "abort_reason": abort_reason,
+                    "analysis": analysis,
+                    "aborted_at": datetime.now().isoformat()
+                }
+            
+            # Prosseguir com automação normal
             execution_id = str(uuid.uuid4())
             exec_tag = self._generate_exec_tag()
             started_at = datetime.now()
@@ -67,7 +211,8 @@ class SeleniumService:
                 "started_at": started_at,
                 "finished_at": None,
                 "created_task_ids": [],
-                "error": None
+                "error": None,
+                "validation_analysis": validation_result  # Salvar análise para debug
             }
             
             self.executions[execution_id] = execution_data
@@ -91,7 +236,8 @@ class SeleniumService:
                 "hours_target": hours_target,
                 "exec_tag": exec_tag,
                 "status": "started",
-                "started_at": started_at.isoformat()
+                "started_at": started_at.isoformat(),
+                "validation_passed": True
             }
             
         except Exception as e:
