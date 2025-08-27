@@ -35,6 +35,32 @@
         .status-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
         .loading { display: inline-block; width: 12px; height: 12px; border: 2px solid #ffffff; border-radius: 50%; border-top: 2px solid transparent; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Estilos da tabela de tarefas */
+        .table-container { overflow-x: auto; margin-top: 20px; border-radius: 8px; }
+        .tasks-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 800px; }
+        .tasks-table th, .tasks-table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #e1e8ed; }
+        .tasks-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-weight: 600; color: white; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tasks-table tr:hover { background: #f8f9fa; transition: background 0.2s ease; }
+        .tasks-table .task-id { font-weight: 600; color: #3498db; width: 80px; }
+        .tasks-table .task-title { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tasks-table .task-state { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; display: inline-block; }
+        .tasks-table .state-1 { background: #fff3cd; color: #856404; }
+        .tasks-table .state-2 { background: #d4ffdd; color: #00b894; }
+        .tasks-table .state-3 { background: #f8d7da; color: #721c24; }
+        .tasks-table .task-time { font-weight: 600; color: #27ae60; text-align: center; width: 80px; }
+        .tasks-table .task-date { font-size: 0.85em; color: #666; width: 130px; }
+        .tasks-table .workorder-link { color: #3498db; text-decoration: none; font-weight: 600; }
+        .tasks-table .workorder-link:hover { text-decoration: underline; color: #2980b9; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #666; font-style: italic; }
+        .loading-state { text-align: center; padding: 40px 20px; color: #3498db; }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .tasks-table { min-width: 600px; font-size: 0.9em; }
+            .tasks-table th, .tasks-table td { padding: 8px 6px; }
+            .tasks-table .task-title { max-width: 180px; }
+        }
     </style>
 </head>
 <body>
@@ -56,6 +82,36 @@
                 </div>
                 <div id="automation-status" class="status-display">Configure a meta de horas e clique em "Gerar Tarefas" para iniciar a automação...</div>
             </section>
+
+            <section class="section">
+                <h2>📋 Últimas Tarefas Criadas</h2>
+                <div class="button-group" style="margin-bottom: 20px;">
+                    <button onclick="loadRecentTasks()" class="secondary">🔄 Atualizar Lista</button>
+                </div>
+                <div class="table-container">
+                    <table id="recent-tasks-table" class="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Estado</th>
+                                <th>Tempo Estimado</th>
+                                <th>Tempo Gasto</th>
+                                <th>Criada em</th>
+                                <th>Chamado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 20px; color: #666;">
+                                    Clique em "Atualizar Lista" para carregar as tarefas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <section class="section">
                 <h2>🔧 Status do Sistema</h2>
                 <div class="button-group">
@@ -166,7 +222,64 @@
         // Inicialização da página
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Página de automação carregada');
+            loadRecentTasks(); // Carregar tarefas automaticamente
         });
+
+        // Carregar tarefas recentes
+        async function loadRecentTasks() {
+            const tableBody = document.getElementById('tasks-table-body');
+            
+            try {
+                tableBody.innerHTML = '<tr><td colspan="7" class="loading-state">🔄 Carregando tarefas...</td></tr>';
+                
+                // Buscar tarefas do usuário
+                const tasksResponse = await fetch('/workorders/user/tasks');
+                const tasksData = await tasksResponse.json();
+                
+                // Buscar workorder atual
+                const workorderResponse = await fetch('/workorders/current');
+                const workorderData = await workorderResponse.json();
+                
+                if (tasksData.success && tasksData.data.user_tasks) {
+                    const tasks = tasksData.data.user_tasks;
+                    const workorderInfo = workorderData.workorder_id ? `#${workorderData.workorder_id}` : 'N/A';
+                    
+                    if (tasks.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="empty-state">📋 Nenhuma tarefa encontrada</td></tr>';
+                        return;
+                    }
+                    
+                    tableBody.innerHTML = tasks.map(task => {
+                        const createdDate = new Date(task.opened_at).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        const stateClass = `state-${task.state}`;
+                        const stateLabel = task.state_label || 'Desconhecido';
+                        
+                        return `
+                            <tr>
+                                <td class="task-id">#${task.task_number}</td>
+                                <td class="task-title" title="${task.title}">${task.title}</td>
+                                <td><span class="task-state ${stateClass}">${stateLabel}</span></td>
+                                <td class="task-time">${task.time_estimated ? task.time_estimated.toFixed(1) + 'h' : '0.0h'}</td>
+                                <td class="task-time">${task.time_spent ? task.time_spent.toFixed(1) + 'h' : '0.0h'}</td>
+                                <td class="task-date">${createdDate}</td>
+                                <td><a href="#" class="workorder-link" title="WorkOrder ${workorderInfo}">${workorderInfo}</a></td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="empty-state">❌ Erro ao carregar tarefas</td></tr>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tarefas:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" class="empty-state">🔌 Erro de conexão</td></tr>';
+            }
+        }
     </script>
 </body>
 </html>
