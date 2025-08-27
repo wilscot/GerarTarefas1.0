@@ -32,28 +32,45 @@ def get_calendar_data():
                     'success': False,
                     'error': 'Formato de data inválido. Use YYYY-MM-DD.'
                 }), 400
-        
-        # Verifica se deve forçar refresh
+
+        # Se uma data de referência específica foi fornecida, usar CalendarService diretamente
+        # para evitar problemas com cache que só funciona para o período atual
+        if reference_date:
+            logger.info(f"Usando CalendarService diretamente para reference_date: {reference_date}")
+            calendar_service = CalendarService()
+            data = calendar_service.get_calendar_data(reference_date)
+            
+            return jsonify({
+                'success': True,
+                'data': data,
+                'cached': False,
+                'using_reference_date': True
+            })
+
+        # Se não houver reference_date, continua com a lógica de cache
         force_refresh = request.args.get('force_refresh', '').lower() == 'true'
         
-        # Usa cache-first approach
         try:
+            # Tenta obter dados do cache
             data = calendar_cache_service.get_calendar_data(force_refresh=force_refresh)
             
             return jsonify({
                 'success': True,
                 'data': data,
-                'cached': True,
+                'cached': not force_refresh,
                 'cache_status': calendar_cache_service.get_cache_status()
             })
             
         except Exception as cache_error:
             logger.warning(f"Erro no cache, fallback para serviço: {cache_error}")
             
-            # Fallback para serviço original
+            # Fallback para serviço original (sem data de referência, pois já foi tratado)
             calendar_service = CalendarService()
-            data = calendar_service.get_calendar_data(reference_date)
+            data = calendar_service.get_calendar_data() # Chama sem argumentos
             
+            # Tenta salvar no cache para a próxima vez
+            calendar_cache_service.set_calendar_data(data)
+
             return jsonify({
                 'success': True,
                 'data': data,
@@ -62,7 +79,7 @@ def get_calendar_data():
             })
         
     except Exception as e:
-        logger.error(f"Erro ao buscar dados do calendário: {e}")
+        logger.error(f"Erro na rota de dados do calendário: {e}")
         return jsonify({
             'success': False,
             'error': 'Erro interno do servidor'

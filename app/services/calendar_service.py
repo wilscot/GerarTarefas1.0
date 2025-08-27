@@ -23,32 +23,45 @@ class CalendarService:
     
     def get_calendar_data(self, reference_date: Optional[date] = None) -> Dict[str, Any]:
         """
-        Retorna dados completos do calendário para o período vigente.
-        Inclui dados diários de tarefas, exclusões e produtividade.
+        Obtém dados completos do calendário para um período específico
+        
+        Args:
+            reference_date: Data de referência para o período (opcional)
         """
-        ref_date = reference_date or date.today()
-        start_date, end_date = get_current_26_25_period(ref_date)
-        
-        # Obter dados de tarefas do banco
-        tasks_data = self._get_tasks_data(start_date, end_date)
-        
-        # Obter dados de exclusões
-        exclusions_data = self._get_exclusions_data(start_date, end_date)
-        
-        # Processar dados diários
-        daily_data = self._process_daily_data(start_date, end_date, tasks_data, exclusions_data)
-        
-        # Organizar em semanas para exibição
-        weeks_data = self._organize_weeks(start_date, end_date, daily_data)
-        
-        return {
-            "period_start": start_date.isoformat(),
-            "period_end": end_date.isoformat(),
-            "reference_date": ref_date.isoformat(),
-            "daily_data": daily_data,
-            "weeks_data": weeks_data,
-            "summary": self._calculate_summary(daily_data)
-        }
+        try:
+            if reference_date:
+                ref_date = reference_date
+                logger.info(f"Calculando período para reference_date: {ref_date}")
+            else:
+                ref_date = date.today()
+                logger.info(f"Nenhuma data de referência fornecida. Usando data atual: {ref_date}")
+
+            start_date, end_date = get_current_26_25_period(ref_date)
+            logger.info(f"Período calculado: {start_date} a {end_date}")
+
+            # Obter dados de tarefas do banco
+            tasks_data = self._get_tasks_data(start_date, end_date)
+            
+            # Obter dados de exclusões
+            exclusions_data = self._get_exclusions_data(start_date, end_date)
+            
+            # Processar dados diários
+            daily_data = self._process_daily_data(start_date, end_date, tasks_data, exclusions_data)
+            
+            # Organizar em semanas para exibição
+            weeks_data = self._organize_weeks(start_date, end_date, daily_data)
+            
+            return {
+                "period_start": start_date.isoformat(),
+                "period_end": end_date.isoformat(),
+                "reference_date": ref_date.isoformat(),
+                "daily_data": daily_data,
+                "weeks_data": weeks_data,
+                "summary": self._calculate_summary(daily_data)
+            }
+        except Exception as e:
+            logger.error(f"Erro ao obter dados do calendário: {e}")
+            raise
     
     def _get_tasks_data(self, start_date: date, end_date: date) -> List[Dict]:
         """
