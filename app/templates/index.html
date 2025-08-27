@@ -198,6 +198,102 @@
         .capacity-exclusoes .capacity-value { color: #e74c3c; }
         .capacity-liquida .capacity-value { color: #27ae60; }
         
+        /* Resumo Executivo do Ciclo */
+        .executive-summary-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #6c757d;
+        }
+        
+        .executive-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .executive-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .executive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .executive-icon {
+            font-size: 2.5em;
+            opacity: 0.8;
+        }
+        
+        .executive-content {
+            flex: 1;
+        }
+        
+        .executive-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .executive-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .progress-bar-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar-label {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            border-radius: 12px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+        
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
         /* Seção do Calendário de Produtividade */
         .calendar-section {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
@@ -311,6 +407,27 @@
             color: #2c3e50;
             min-width: 200px;
             text-align: center;
+        }
+
+        /* Seletor de Período Global */
+        .period-selector-global {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .period-selector-global label {
+            font-weight: 600;
+            color: white;
+            font-size: 18px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .calendar-legend {
@@ -840,6 +957,10 @@
                 grid-template-columns: 1fr;
             }
             
+            .executive-summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .status-summary-grid {
                 grid-template-columns: 1fr;
             }
@@ -912,6 +1033,22 @@
                 </div>
             </section>
 
+            <!-- Seletor de Período Global -->
+            <div class="period-selector-global">
+                <label>📅 Navegação de Período:</label>
+                <div class="period-navigation">
+                    <button type="button" class="btn-period-nav" onclick="navigateToPreviousPeriod()" id="btn-previous-period">
+                        ⬅️ Anterior
+                    </button>
+                    <div class="current-period" id="current-period-display">
+                        Período Atual
+                    </div>
+                    <button type="button" class="btn-period-nav" onclick="navigateToNextPeriod()" id="btn-next-period">
+                        Próximo ➡️
+                    </button>
+                </div>
+            </div>
+
             <!-- Seção de Capacidade Técnica (agora com destaque total) -->
             <section class="section capacity-section">
                 <h2>📊 Capacidade Técnica - Período Vigente</h2>
@@ -941,27 +1078,57 @@
                 </div>
             </section>
 
+            <!-- Resumo Executivo do Ciclo -->
+            <section class="section executive-summary-section">
+                <h2>📊 Resumo Executivo do Ciclo</h2>
+                
+                <div class="executive-summary-grid">
+                    <div class="executive-card">
+                        <div class="executive-icon">📋</div>
+                        <div class="executive-content">
+                            <div class="executive-value" id="total-tasks">--</div>
+                            <div class="executive-label">TAREFAS CRIADAS</div>
+                        </div>
+                    </div>
+                    
+                    <div class="executive-card">
+                        <div class="executive-icon">⏰</div>
+                        <div class="executive-content">
+                            <div class="executive-value" id="total-hours-worked">--h</div>
+                            <div class="executive-label">HORAS TRABALHADAS</div>
+                        </div>
+                    </div>
+                    
+                    <div class="executive-card">
+                        <div class="executive-icon">🎯</div>
+                        <div class="executive-content">
+                            <div class="executive-value" id="progress-percentage">--%</div>
+                            <div class="executive-label">PROGRESSO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="executive-card">
+                        <div class="executive-icon">⏳</div>
+                        <div class="executive-content">
+                            <div class="executive-value" id="remaining-hours">--h</div>
+                            <div class="executive-label">RESTANTE</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label" id="progress-bar-label">0.0% da capacidade utilizada</div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Calendário de Produtividade -->
             <section class="section calendar-section">
                 <h2>📅 Calendário de Produtividade - Período Vigente</h2>
                 
                 <div class="calendar-container">
-                    <!-- Seletor de Período -->
-                    <div class="period-selector">
-                        <label>📅 Navegação de Período:</label>
-                        <div class="period-navigation">
-                            <button type="button" class="btn-period-nav" onclick="navigateToPreviousPeriod()" id="btn-previous-period">
-                                ⬅️ Anterior
-                            </button>
-                            <div class="current-period" id="current-period-display">
-                                Período Atual
-                            </div>
-                            <button type="button" class="btn-period-nav" onclick="navigateToNextPeriod()" id="btn-next-period">
-                                Próximo ➡️
-                            </button>
-                        </div>
-                    </div>
-                    
                     <div class="calendar-header">
                         <div class="calendar-title" id="calendar-period">
                             <span>📅 Carregando período...</span>
@@ -1050,6 +1217,10 @@
         let autoRefresh = false;
         let refreshInterval;
         
+        // Variáveis globais para dados do resumo executivo
+        let currentCapacityData = null;
+        let currentCalendarData = null;
+        
         // Carregamento inicial da página
         document.addEventListener('DOMContentLoaded', function() {
             loadCapacityData();
@@ -1077,11 +1248,31 @@
         async function loadCapacityData() {
             try {
                 addLog('Carregando dados de capacidade...', 'info');
-                const response = await fetch('/capacity/demo');
+                
+                let url = '/capacity/demo';
+                
+                // Aplicar offset do período se não for o período atual
+                if (currentPeriodOffset !== 0) {
+                    const today = new Date();
+                    const referenceDate = new Date(today);
+                    referenceDate.setMonth(today.getMonth() + currentPeriodOffset);
+                    
+                    const referenceDateStr = referenceDate.toISOString().split('T')[0];
+                    url += `?reference_date=${referenceDateStr}`;
+                }
+                
+                const response = await fetch(url);
                 const data = await response.json();
                 
                 if (response.ok) {
+                    currentCapacityData = data;
                     updateCapacityDisplay(data);
+                    
+                    // Atualizar resumo executivo se os dados do calendário estiverem disponíveis
+                    if (currentCalendarData) {
+                        updateExecutiveSummary(currentCalendarData, currentCapacityData);
+                    }
+                    
                     addLog('Dados de capacidade carregados com sucesso', 'success');
                 } else {
                     throw new Error(data.error || 'Erro ao carregar dados de capacidade');
@@ -1113,6 +1304,73 @@
             // Capacidade Líquida
             const netCapacity = data.net_capacity_hours || data.capacity_hours;
             document.getElementById('capacity-liquida').textContent = `${netCapacity}h`;
+        }
+        
+        // Atualizar resumo executivo do ciclo
+        function updateExecutiveSummary(calendarData, capacityData) {
+            try {
+                let totalTasks = 0;
+                let totalHoursWorked = 0;
+                
+                // Processar dados do calendário para calcular métricas
+                if (calendarData && calendarData.daily_data) {
+                    Object.values(calendarData.daily_data).forEach(day => {
+                        if (day.tasks && Array.isArray(day.tasks)) {
+                            totalTasks += day.tasks.length;
+                            day.tasks.forEach(task => {
+                                const hoursWorked = parseFloat(task.TempoGasto || 0);
+                                totalHoursWorked += hoursWorked;
+                            });
+                        }
+                    });
+                }
+                
+                // Capacidade líquida do período
+                const netCapacity = capacityData?.net_capacity_hours || capacityData?.capacity_hours || 0;
+                const netCapacityFloat = parseFloat(netCapacity);
+                
+                // Cálculos
+                const progressPercentage = netCapacityFloat > 0 ? (totalHoursWorked / netCapacityFloat * 100) : 0;
+                const remainingHours = Math.max(0, netCapacityFloat - totalHoursWorked);
+                
+                // Atualizar elementos
+                document.getElementById('total-tasks').textContent = totalTasks;
+                document.getElementById('total-hours-worked').textContent = `${totalHoursWorked.toFixed(1)}h`;
+                document.getElementById('progress-percentage').textContent = `${progressPercentage.toFixed(1)}%`;
+                document.getElementById('remaining-hours').textContent = `${remainingHours.toFixed(1)}h`;
+                
+                // Atualizar barra de progresso
+                const progressBarFill = document.getElementById('progress-bar-fill');
+                const progressBarLabel = document.getElementById('progress-bar-label');
+                
+                const clampedProgress = Math.min(100, Math.max(0, progressPercentage));
+                progressBarFill.style.width = `${clampedProgress}%`;
+                progressBarLabel.textContent = `${progressPercentage.toFixed(1)}% da capacidade utilizada`;
+                
+                // Mudar cor da barra baseado no progresso
+                if (progressPercentage <= 50) {
+                    progressBarFill.style.background = 'linear-gradient(90deg, #28a745, #20c997)'; // Verde
+                } else if (progressPercentage <= 85) {
+                    progressBarFill.style.background = 'linear-gradient(90deg, #ffc107, #fd7e14)'; // Amarelo/Laranja
+                } else {
+                    progressBarFill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)'; // Vermelho
+                }
+                
+                console.log('Resumo executivo atualizado:', {
+                    totalTasks,
+                    totalHoursWorked: totalHoursWorked.toFixed(1),
+                    progressPercentage: progressPercentage.toFixed(1),
+                    remainingHours: remainingHours.toFixed(1)
+                });
+                
+            } catch (error) {
+                console.error('Erro ao atualizar resumo executivo:', error);
+                // Valores padrão em caso de erro
+                document.getElementById('total-tasks').textContent = '--';
+                document.getElementById('total-hours-worked').textContent = '--h';
+                document.getElementById('progress-percentage').textContent = '--%';
+                document.getElementById('remaining-hours').textContent = '--h';
+            }
         }
         
         // Status SQL resumido
@@ -1285,6 +1543,9 @@
         const periodElement = document.getElementById('calendar-period').querySelector('span');
 
         try {
+            // Armazenar dados do calendário para o resumo executivo
+            currentCalendarData = data;
+            
             const startDate = new Date(data.period_start + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'UTC' });
             const endDate = new Date(data.period_end + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'UTC' });
             periodElement.textContent = `📅 ${startDate} - ${endDate}`;
@@ -1296,6 +1557,11 @@
             document.querySelectorAll('.calendar-day:not(.out-of-period)').forEach(day => {
                 day.addEventListener('click', () => openDayModal(day.dataset.date));
             });
+            
+            // Atualizar resumo executivo se os dados de capacidade estiverem disponíveis
+            if (currentCapacityData) {
+                updateExecutiveSummary(currentCalendarData, currentCapacityData);
+            }
 
         } catch (error) {
             console.error('Erro em updateCalendarDisplay:', error);
@@ -1608,6 +1874,9 @@
             }
             
             updateCalendarDisplay(result.data);
+            
+            // Recarregar capacidade para o novo período
+            await loadCapacityData();
         }
         
         // Atualizar display do período atual
