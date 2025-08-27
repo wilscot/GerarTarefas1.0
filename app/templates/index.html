@@ -881,6 +881,7 @@
             <!-- Menu de navegação -->
             <nav class="nav-menu">
                 <a href="/" class="nav-btn active">🏠 Home</a>
+                <a href="/automation/" class="nav-btn">🤖 Automação</a>
                 <a href="/exclusions" class="nav-btn">🚫 Exclusões</a>
                 <a href="/status-page" class="nav-btn">⚙️ Status</a>
             </nav>
@@ -1001,25 +1002,6 @@
                 </div>
             </section>
 
-            <!-- Automação Selenium -->
-            <section class="section">
-                <h2>🤖 Automação Selenium</h2>
-                <div class="input-group">
-                    <label for="hours-target">Horas Alvo:</label>
-                    <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
-                </div>
-                <div class="button-group">
-                    <button onclick="runAutomation()" class="success" id="run-automation-btn">Gerar Tarefas</button>
-                    <span class="last-execution-info" id="last-execution-info">
-                        <small>🕒 Última execução: <span id="last-execution-time">Nunca</span></small>
-                    </span>
-                    <button onclick="getRunningProcesses()">Ver Processos</button>
-                </div>
-                <div id="automation-status" class="status-display">
-                    Configure as horas e clique em "Gerar Tarefas" para iniciar a automação...
-                </div>
-            </section>
-
             <!-- Minhas Últimas Tarefas -->
             <section class="section">
                 <h2>📋 Minhas Últimas Tarefas</h2>
@@ -1075,7 +1057,6 @@
             loadWorkorderSummary();
             loadCalendarData();
             initializePeriodSelector(); // Inicializar seletor de período
-            loadLastExecution(); // Carregar última execução
             loadUserTasks(); // Carregar tarefas do usuário
             addLog('Sistema iniciado', 'info');
         });
@@ -1180,73 +1161,6 @@
         function showDetailedStatus() {
             // Por enquanto, vamos usar um alert - depois pode ser uma modal ou página separada
             alert('Funcionalidade de status detalhado será implementada em breve!\n\nPor enquanto, acesse:\n- Status SQL: /status/sql-test\n- Workorders: /workorders/current');
-        }
-        
-        // Automação
-        async function runAutomation() {
-            const hoursTarget = document.getElementById('hours-target').value;
-            const statusDiv = document.getElementById('automation-status');
-            const button = document.getElementById('run-automation-btn');
-            
-            button.disabled = true;
-            button.innerHTML = 'Executando... <span class="loading"></span>';
-            statusDiv.innerHTML = 'Iniciando automação...';
-            
-            addLog(`Iniciando automação com meta de ${hoursTarget} horas`, 'info');
-            
-            try {
-                const response = await fetch('/automation/run', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        hours_target: parseFloat(hoursTarget),
-                        workorder_title: "{{ config.WORKORDER_TITLE }}",
-                        owner_id: {{ config.OWNER_ID }}
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    statusDiv.innerHTML = `<div class="status-item status-success">${data.message}</div>`;
-                    addLog('Automação executada com sucesso', 'success');
-                } else {
-                    statusDiv.innerHTML = `<div class="status-item status-error">Erro: ${data.error}</div>`;
-                    addLog(`Erro na automação: ${data.error}`, 'error');
-                }
-            } catch (error) {
-                statusDiv.innerHTML = `<div class="status-item status-error">Erro de conexão: ${error.message}</div>`;
-                addLog(`Erro de conexão: ${error.message}`, 'error');
-            } finally {
-                button.disabled = false;
-                button.innerHTML = 'Gerar Tarefas';
-                // Recarregar informação da última execução
-                loadLastExecution();
-            }
-        }
-        
-        // Processos em execução
-        async function getRunningProcesses() {
-            try {
-                addLog('Verificando processos em execução...', 'info');
-                const response = await fetch('/automation/status');
-                const data = await response.json();
-                
-                const statusDiv = document.getElementById('automation-status');
-                if (data.processes && data.processes.length > 0) {
-                    statusDiv.innerHTML = data.processes.map(p => 
-                        `<div class="status-item status-info">PID: ${p.pid} - ${p.name}</div>`
-                    ).join('');
-                    addLog(`${data.processes.length} processo(s) encontrado(s)`, 'info');
-                } else {
-                    statusDiv.innerHTML = '<div class="status-item status-warning">Nenhum processo em execução</div>';
-                    addLog('Nenhum processo em execução', 'warning');
-                }
-            } catch (error) {
-                addLog(`Erro ao verificar processos: ${error.message}`, 'error');
-            }
         }
         
         // Logs
@@ -1723,42 +1637,6 @@
         }
 
         // Função para carregar e exibir última execução
-        async function loadLastExecution() {
-            try {
-                const response = await fetch('/automation/execution/last');
-                const data = await response.json();
-                
-                const lastExecutionSpan = document.getElementById('last-execution-time');
-                
-                if (data.success && data.last_execution) {
-                    const timestamp = new Date(data.last_execution.timestamp);
-                    const timeStr = timestamp.toLocaleString('pt-BR');
-                    const status = data.last_execution.status;
-                    
-                    let statusIcon = '';
-                    switch(status) {
-                        case 'completed': statusIcon = '✅'; break;
-                        case 'failed': statusIcon = '❌'; break;
-                        case 'started': statusIcon = '🔄'; break;
-                        default: statusIcon = '⏸️';
-                    }
-                    
-                    lastExecutionSpan.innerHTML = `${statusIcon} ${timeStr} (${status})`;
-                } else {
-                    lastExecutionSpan.innerHTML = 'Nunca';
-                }
-            } catch (error) {
-                console.error('Erro ao carregar última execução:', error);
-                document.getElementById('last-execution-time').innerHTML = 'Erro';
-            }
-        }
-
-        // Carregar última execução quando a página carrega
-        document.addEventListener('DOMContentLoaded', function() {
-            loadLastExecution();
-            loadUserTasks(); // Carregar tarefas do usuário também
-        });
-
         // Variável para controlar visualização (lista ou resumo)
         let showingTasksSummary = false;
 

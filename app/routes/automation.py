@@ -3,13 +3,20 @@ Automation routes
 Endpoints para execução da automação Selenium com verificação real de TASKIDs
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from app.services.workorder_service import WorkOrderService
 from app.services.cache_service import CacheService
 from app.services.selenium_service import selenium_service
 from app.services.execution_cache_service import execution_cache_service
 
 automation_bp = Blueprint('automation', __name__)
+
+@automation_bp.route('/', methods=['GET'])
+def automation_page():
+    """
+    Página web da automação Selenium
+    """
+    return render_template('automation.html')
 
 @automation_bp.route('/run', methods=['POST'])
 def run_automation():

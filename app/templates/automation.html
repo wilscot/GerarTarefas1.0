@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automação Selenium - ServiceDesk</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(45deg, #2c3e50, #3498db); color: white; padding: 30px; text-align: center; position: relative; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .back-btn { position: absolute; top: 20px; left: 30px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-1px); }
+        .main-content { padding: 40px; }
+        .section { margin-bottom: 30px; padding: 25px; border: 1px solid #e1e8ed; border-radius: 8px; background: #f8f9fa; }
+        .section h2 { color: #2c3e50; margin-bottom: 20px; font-size: 1.8em; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50; }
+        .input-group input { width: 100%; max-width: 200px; padding: 12px; border: 2px solid #e1e8ed; border-radius: 6px; font-size: 1.1em; transition: border-color 0.3s ease; }
+        .input-group input:focus { outline: none; border-color: #3498db; }
+        .button-group { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s ease; }
+        .success { background: #27ae60; color: white; }
+        .success:hover { background: #229954; transform: translateY(-2px); }
+        .success:disabled { background: #95a5a6; transform: none; cursor: not-allowed; }
+        .secondary { background: #95a5a6; color: white; }
+        .secondary:hover { background: #7f8c8d; }
+        .status-display { margin-top: 20px; padding: 15px; border-radius: 6px; background: #ecf0f1; border-left: 4px solid #3498db; min-height: 60px; font-size: 1.1em; }
+        .status-item { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .status-success { background: #d5f4e6; color: #27ae60; border-left: 4px solid #27ae60; }
+        .status-error { background: #fdf2f2; color: #e74c3c; border-left: 4px solid #e74c3c; }
+        .status-info { background: #e3f2fd; color: #2196f3; border-left: 4px solid #2196f3; }
+        .status-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .loading { display: inline-block; width: 12px; height: 12px; border: 2px solid #ffffff; border-radius: 50%; border-top: 2px solid transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← Voltar ao Dashboard</a>
+            <h1>🤖 Automação Selenium</h1>
+            <p>Geração automatizada de tarefas no ServiceDesk</p>
+        </div>
+        <div class="main-content">
+            <section class="section">
+                <h2>⚡ Executar Automação</h2>
+                <div class="input-group">
+                    <label for="hours-target">Meta de Horas (0.1 a 24.0):</label>
+                    <input type="number" id="hours-target" value="8.0" min="0.1" max="24" step="0.1">
+                </div>
+                <div class="button-group">
+                    <button onclick="runAutomation()" class="success" id="run-automation-btn">🚀 Gerar Tarefas</button>
+                </div>
+                <div id="automation-status" class="status-display">Configure a meta de horas e clique em "Gerar Tarefas" para iniciar a automação...</div>
+            </section>
+            <section class="section">
+                <h2>🔧 Status do Sistema</h2>
+                <div class="button-group">
+                    <button onclick="checkSystemStatus()" class="secondary">🔍 Verificar SQL</button>
+                    <button onclick="checkWorkOrder()" class="secondary">📋 Verificar WorkOrder</button>
+                    <button onclick="clearCache()" class="secondary">🗑️ Limpar Cache</button>
+                </div>
+                <div id="system-status" class="status-display">Clique nos botões acima para verificar o status dos componentes do sistema...</div>
+            </section>
+        </div>
+    </div>
+    <script>
+        // Função principal de automação
+        async function runAutomation() {
+            const hoursTarget = document.getElementById('hours-target').value;
+            const statusDiv = document.getElementById('automation-status');
+            const button = document.getElementById('run-automation-btn');
+            
+            button.disabled = true;
+            button.innerHTML = 'Executando... <span class="loading"></span>';
+            statusDiv.innerHTML = 'Iniciando automação...';
+            
+            try {
+                const response = await fetch('/automation/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        hours_target: parseFloat(hoursTarget)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = `<div class="status-item status-success">${data.message}</div>`;
+                } else {
+                    statusDiv.innerHTML = `<div class="status-item status-error">Erro: ${data.error}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-item status-error">Erro de conexão: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '🚀 Gerar Tarefas';
+            }
+        }
+        
+        // Verificar status do SQL Server
+        async function checkSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '<div class="status-item status-info">Verificando conexão com SQL Server...</div>';
+            
+            try {
+                const response = await fetch('/status/sql-test');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    statusDiv.innerHTML = '<div class="status-item status-success">✅ SQL Server conectado com sucesso</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status-item status-error">❌ Erro na conexão com SQL Server</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status-item status-error">❌ Erro ao verificar SQL Server</div>';
+            }
+        }
+        
+        // Verificar WorkOrder atual
+        async function checkWorkOrder() {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '<div class="status-item status-info">Verificando WorkOrder vigente...</div>';
+            
+            try {
+                const response = await fetch('/workorders/current');
+                const data = await response.json();
+                
+                if (data.workorder_id) {
+                    const date = data.created_time ? new Date(data.created_time).toLocaleDateString('pt-BR') : 'Data N/A';
+                    statusDiv.innerHTML = `<div class="status-item status-success">✅ WorkOrder vigente: #${data.workorder_id} - ${date}</div>`;
+                } else {
+                    statusDiv.innerHTML = '<div class="status-item status-warning">⚠️ Nenhum WorkOrder vigente encontrado</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status-item status-error">❌ Erro ao verificar WorkOrder</div>';
+            }
+        }
+        
+        // Limpar cache do sistema
+        async function clearCache() {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '<div class="status-item status-info">Limpando cache do sistema...</div>';
+            
+            try {
+                const response = await fetch('/api/clear-cache', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status-item status-success">✅ Cache limpo com sucesso</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status-item status-warning">⚠️ Cache parcialmente limpo</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status-item status-error">❌ Erro ao limpar cache</div>';
+            }
+        }
+        
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de automação carregada');
+        });
+    </script>
+</body>
+</html>
