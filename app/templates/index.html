@@ -414,8 +414,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
@@ -423,11 +422,34 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .period-selector-global label {
-            font-weight: 600;
+        /* Botão de Atualização Global */
+        .global-refresh-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .global-refresh-btn {
+            padding: 12px 24px;
+            background: #27ae60;
             color: white;
-            font-size: 18px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .global-refresh-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .global-refresh-btn:active {
+            transform: translateY(0);
         }
         
         .calendar-legend {
@@ -1035,7 +1057,6 @@
 
             <!-- Seletor de Período Global -->
             <div class="period-selector-global">
-                <label>📅 Navegação de Período:</label>
                 <div class="period-navigation">
                     <button type="button" class="btn-period-nav" onclick="navigateToPreviousPeriod()" id="btn-previous-period">
                         ⬅️ Anterior
@@ -1049,9 +1070,16 @@
                 </div>
             </div>
 
+            <!-- Botão de Atualização Global -->
+            <div class="global-refresh-section">
+                <button id="calendar-refresh-btn" class="global-refresh-btn" onclick="refreshCalendar()">
+                    🔄 Atualizar Dados
+                </button>
+            </div>
+
             <!-- Seção de Capacidade Técnica (agora com destaque total) -->
             <section class="section capacity-section">
-                <h2>📊 Capacidade Técnica - Período Vigente</h2>
+                <h2>📊 Capacidade Técnica</h2>
                 
                 <div class="period-info" id="period-info">
                     📅 Carregando período...
@@ -1126,15 +1154,12 @@
 
             <!-- Calendário de Produtividade -->
             <section class="section calendar-section">
-                <h2>📅 Calendário de Produtividade - Período Vigente</h2>
+                <h2>📅 Calendário de Produtividade</h2>
                 
                 <div class="calendar-container">
                     <div class="calendar-header">
                         <div class="calendar-title" id="calendar-period">
                             <span>📅 Carregando período...</span>
-                            <button id="calendar-refresh-btn" class="calendar-refresh-btn" onclick="refreshCalendar()">
-                                🔄 Atualizar
-                            </button>
                         </div>
                         <div class="calendar-legend">
                             <div class="legend-item">
@@ -1258,7 +1283,7 @@
                     referenceDate.setMonth(today.getMonth() + currentPeriodOffset);
                     
                     const referenceDateStr = referenceDate.toISOString().split('T')[0];
-                    url += `?reference_date=${referenceDateStr}`;
+                    url += `?reference=${referenceDateStr}`;
                 }
                 
                 const response = await fetch(url);
@@ -1463,7 +1488,10 @@
             button.innerHTML = '⏳ Atualizando...';
             
             try {
-                addLog('Forçando atualização do calendário...', 'info');
+                addLog('Atualizando todos os dados da página...', 'info');
+                
+                // Recarregar dados de capacidade
+                await loadCapacityData();
                 
                 // Usar o período atual (com offset) ao fazer refresh
                 let url = '/calendar/data?force_refresh=true';
@@ -1493,7 +1521,13 @@
                 }
                 
                 updateCalendarDisplay(result.data);
-                addLog('Calendário atualizado com sucesso! ✅', 'success');
+                
+                // Recarregar dados adicionais
+                await loadUserTasks(true);
+                checkSqlConnection();
+                loadCurrentWorkorder();
+                
+                addLog('Todos os dados atualizados com sucesso! ✅', 'success');
                 
             } catch (error) {
                 const errorMessage = `Erro ao atualizar calendário: ${error.message}`;
@@ -1503,7 +1537,7 @@
             } finally {
                 // Reabilitar botão
                 button.disabled = false;
-                button.innerHTML = '🔄 Atualizar';
+                button.innerHTML = '🔄 Atualizar Dados';
             }
         }
         
@@ -1884,18 +1918,32 @@
             const periodDisplay = document.getElementById('current-period-display');
             
             if (currentPeriodOffset === 0) {
-                periodDisplay.textContent = 'Período Atual';
+                periodDisplay.textContent = 'Setembro';
                 periodDisplay.style.background = 'white';
                 periodDisplay.style.borderColor = '#3498db';
-            } else if (currentPeriodOffset < 0) {
-                const months = Math.abs(currentPeriodOffset);
-                periodDisplay.textContent = `${months} mês${months > 1 ? 'es' : ''} atrás`;
-                periodDisplay.style.background = '#fff3cd';
-                periodDisplay.style.borderColor = '#ffc107';
             } else {
-                periodDisplay.textContent = `${currentPeriodOffset} mês${currentPeriodOffset > 1 ? 'es' : ''} à frente`;
-                periodDisplay.style.background = '#d1ecf1';
-                periodDisplay.style.borderColor = '#17a2b8';
+                // Calcular o mês baseado no offset
+                // Como o período vai do dia 26 ao dia 25 do mês seguinte,
+                // o mês representativo é o mês seguinte ao início do período
+                const today = new Date();
+                const targetDate = new Date(today);
+                targetDate.setMonth(today.getMonth() + currentPeriodOffset + 1); // +1 para o mês seguinte
+                
+                const monthNames = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                ];
+                
+                const monthName = monthNames[targetDate.getMonth()];
+                periodDisplay.textContent = monthName;
+                
+                if (currentPeriodOffset < 0) {
+                    periodDisplay.style.background = '#fff3cd';
+                    periodDisplay.style.borderColor = '#ffc107';
+                } else {
+                    periodDisplay.style.background = '#d1ecf1';
+                    periodDisplay.style.borderColor = '#17a2b8';
+                }
             }
         }
         
